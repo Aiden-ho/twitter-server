@@ -14,10 +14,18 @@ export const USER_MESSAGES = {
   CONFIRM_PASSWORD_MUST_BE_A_STRING: 'Confirm password must be a string',
   CONFIRM_PASSWORD_IS_NOT_MATCH: 'Confirm password is not match',
   DATE_OF_BIRTH_MUST_BE_A_ISO861: 'Date of birth must be a ISO861',
-  USER_NOT_FOUND: 'User not found',
+  EMAIL_OR_PASSWORD_INCORRECT: 'Email or password is incorrect',
   ACCESS_TOKEN_IS_REQUIRED: 'Access token is requried',
   ACCESS_TOKEN_IS_INVALID: 'Access token is invalid',
   REFRESH_TOKEN_IS_REQUIRED: 'Refresh token is requried',
   REFRESH_TOKEN_IS_INVALID: 'Refresh token is invalid',
-  USED_REFRESH_TOKEN_OR_NOT_EXISTS: 'Used refresh token or not exists'
+  USED_REFRESH_TOKEN_OR_NOT_EXISTS: 'Used refresh token or not exists',
+  EMAIL_VERIFY_TOKEN_IS_REQUIRED: 'Email verify  token is requried',
+  EMAIL_VERIFY_TOKEN_IS_INVALID: 'Email verify is invalid',
+  EMAIL_IS_VERIFIED: 'Email is verified',
+  USER_NOT_FOUND: 'User not found',
+  EMAIL_VERIFY_SUCCESSFUL: 'Email verify successful',
+  LOGIN_SUCCESSFUL: 'Login successful',
+  LOGOUT_SUCCESSFULL: 'Logout successful',
+  REGISTER_SUCCESSFULL: 'Register successful'
 } as const

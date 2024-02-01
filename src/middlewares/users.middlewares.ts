@@ -34,7 +34,10 @@ export const loginValidator = validationRunner(
             const user = await userServices.getUser(email, value)
 
             if (!user) {
-              throw new ErrorWithStatus({ message: USER_MESSAGES.USER_NOT_FOUND, status: HTTP_STATUS.UNAUTHORIZED })
+              throw new ErrorWithStatus({
+                message: USER_MESSAGES.EMAIL_OR_PASSWORD_INCORRECT,
+                status: HTTP_STATUS.UNAUTHORIZED
+              })
             }
 
             req.user = user
@@ -136,6 +139,7 @@ export const accessTokenValidator = validationRunner(
   checkSchema(
     {
       Authorization: {
+        trim: true,
         custom: {
           options: async (value: string, { req }) => {
             try {
@@ -148,7 +152,10 @@ export const accessTokenValidator = validationRunner(
               }
               //verify access token
               const access_token = value.replace('Bearer ', '')
-              const decoded_authorization = await verifyToken({ token: access_token })
+              const decoded_authorization = await verifyToken({
+                token: access_token,
+                secretKey: process.env.JWT_SERCRET_ACCESS_TOKEN as string
+              })
               //add decode token to req
               ;(req as Request).decoded_authorization = decoded_authorization
             } catch (error) {
@@ -173,8 +180,9 @@ export const refreshTokenValidator = validationRunner(
   checkSchema(
     {
       refresh_token: {
+        trim: true,
         custom: {
-          options: async (value, { req }) => {
+          options: async (value: string, { req }) => {
             try {
               //check empty refresh token with custom error
               if (!value) {
@@ -185,7 +193,7 @@ export const refreshTokenValidator = validationRunner(
               }
               //verufy refresh token
               const [decoded_refesh_token, refresh_token] = await Promise.all([
-                verifyToken({ token: value }),
+                verifyToken({ token: value, secretKey: process.env.JWT_SERCRET_REFRESH_TOKEN as string }),
                 refreshTokensServices.get(value)
               ])
               //check refresh token is in DB
@@ -201,6 +209,47 @@ export const refreshTokenValidator = validationRunner(
               if (error instanceof JsonWebTokenError) {
                 throw new ErrorWithStatus({
                   message: USER_MESSAGES.ACCESS_TOKEN_IS_INVALID,
+                  status: HTTP_STATUS.UNAUTHORIZED
+                })
+              }
+
+              throw error
+            }
+          }
+        }
+      }
+    },
+    ['body']
+  )
+)
+
+export const verifyEmailValidator = validationRunner(
+  checkSchema(
+    {
+      email_verify_token: {
+        trim: true,
+        custom: {
+          options: async (value: string, { req }) => {
+            try {
+              //check empty refresh token with custom error
+              if (!value) {
+                throw new ErrorWithStatus({
+                  message: USER_MESSAGES.EMAIL_VERIFY_TOKEN_IS_REQUIRED,
+                  status: HTTP_STATUS.UNAUTHORIZED
+                })
+              }
+
+              const decoded_email_verify_token = await verifyToken({
+                token: value,
+                secretKey: process.env.JWT_SERCRET_EMAIL_VERIFY_TOKEN as string
+              })
+
+              //add decode token to req
+              ;(req as Request).decoded_email_verify_token = decoded_email_verify_token
+            } catch (error) {
+              if (error instanceof JsonWebTokenError) {
+                throw new ErrorWithStatus({
+                  message: USER_MESSAGES.EMAIL_VERIFY_TOKEN_IS_INVALID,
                   status: HTTP_STATUS.UNAUTHORIZED
                 })
               }
