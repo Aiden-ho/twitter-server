@@ -1,3 +1,5 @@
+import omitBy from 'lodash/omitBy'
+import isNil from 'lodash/isNil'
 import { RegsiterReqBody } from '~/models/requests/User.request'
 import databaseServices from './database.services'
 import User from '~/models/schemas/User.schema'
@@ -6,6 +8,7 @@ import { signToken } from '~/utils/jwt'
 import { TokenType, UserVerifyStatus } from '~/constants/enum'
 import refreshTokensServices from './refreshTokens.services'
 import { ObjectId } from 'mongodb'
+import { USER_MESSAGES } from '~/constants/messages'
 
 class UserServices {
   private signAccessToken(user_id: string) {
@@ -15,6 +18,7 @@ class UserServices {
       options: { expiresIn: process.env.ACCESS_TOKEN_EXPIRED }
     })
   }
+
   private signRefreshToken(user_id: string) {
     return signToken({
       payload: { user_id, token_type: TokenType.AccessToken },
@@ -22,11 +26,20 @@ class UserServices {
       options: { expiresIn: process.env.REFRESH_TOKEN_EXPIRED }
     })
   }
+
   private signEmailVerifyToken(user_id: string) {
     return signToken({
       payload: { user_id, token_type: TokenType.EmailVerifyToken },
       privateKey: process.env.JWT_SERCRET_EMAIL_VERIFY_TOKEN as string,
-      options: { expiresIn: process.env.REFRESH_TOKEN_EXPIRED }
+      options: { expiresIn: process.env.EMAIL_VERIFY_TOKEN_EXPIRED }
+    })
+  }
+
+  private signforgotPasswordToken(user_id: string) {
+    return signToken({
+      payload: { user_id, token_type: TokenType.ForgotPasswordToken },
+      privateKey: process.env.JWT_SERCRET_FORGOT_PASSWORD_TOKEN as string,
+      options: { expiresIn: process.env.FORGOT_PASSWORD_TOKEN_EXPIRED }
     })
   }
 
@@ -72,8 +85,12 @@ class UserServices {
     return Boolean(user)
   }
 
-  async getUser(email: string, password: string) {
-    const user = await databaseServices.users.findOne({ email, password: hashPassword(password) })
+  async getUser(email: string, password?: string) {
+    const query = {
+      email,
+      ...(password && { password: hashPassword(password) })
+    }
+    const user = await databaseServices.users.findOne(query)
     return user
   }
 
@@ -88,7 +105,10 @@ class UserServices {
       databaseServices.users.updateOne(
         { _id: new ObjectId(user_id) },
         {
-          $set: { email_verify_token: '', verify: UserVerifyStatus.Verified, updated_at: new Date() }
+          $set: { email_verify_token: '', verify: UserVerifyStatus.Verified },
+          $currentDate: {
+            updated_at: true
+          }
         }
       )
     ])
@@ -96,6 +116,68 @@ class UserServices {
     return {
       access_token,
       refresh_token
+    }
+  }
+
+  async resendVerifyEmail(user_id: string) {
+    const email_verify_token = await this.signEmailVerifyToken(user_id)
+
+    //Giả lập gửi email
+    console.log('email_verify_token', email_verify_token)
+
+    //update lại token mới
+    databaseServices.users.updateOne(
+      { _id: new ObjectId(user_id) },
+      {
+        $set: { email_verify_token },
+        $currentDate: {
+          updated_at: true
+        }
+      }
+    )
+
+    return {
+      message: USER_MESSAGES.RESEND_EMAIL_VERIFY_SUCCESS
+    }
+  }
+
+  async forgotPassword(user_id: string) {
+    const forgot_password_token = await this.signforgotPasswordToken(user_id)
+
+    //update lại token mới
+    databaseServices.users.updateOne(
+      { _id: new ObjectId(user_id) },
+      {
+        $set: { forgot_password_token },
+        $currentDate: {
+          updated_at: true
+        }
+      }
+    )
+
+    //Giả lập gửi email lấy lại mật khẩu (/forgot-password?token=forgot_password_token)
+    console.log('forgot_password_token', forgot_password_token)
+
+    return {
+      message: USER_MESSAGES.CHECK_EMAIL_TO_RESET_PASSWORD
+    }
+  }
+
+  async resetPassword(user_id: string, password: string) {
+    await databaseServices.users.updateOne(
+      { _id: new ObjectId(user_id) },
+      {
+        $set: {
+          forgot_password_token: '',
+          password: hashPassword(password)
+        },
+        $currentDate: {
+          updated_at: true
+        }
+      }
+    )
+    return {
+      message: USER_MESSAGES.RESET_PASSWORD_SUCCESSFUL
     }
   }
 }

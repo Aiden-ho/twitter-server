@@ -8,5 +8,6 @@ declare module 'express' {
     decoded_authorization?: PayloadToken
     decoded_refesh_token?: PayloadToken
     decoded_email_verify_token?: PayloadToken
+    decoded_forgot_password_token?: PayloadToken
   }
 }
