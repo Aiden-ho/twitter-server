@@ -1,14 +1,18 @@
 import { Router } from 'express'
 import {
   forgotPasswordController,
+  getMeController,
+  getUserController,
   loginController,
   logoutController,
   registerController,
   resendVerifyEmailController,
   resetPasswordController,
+  updateMeController,
   verifyEmailController,
   verifyForgotpasswordController
 } from '~/controllers/user.controller'
+import { filterMiddleware } from '~/middlewares/comon.middlewares'
 import {
   loginValidator,
   accessTokenValidator,
@@ -17,8 +21,19 @@ import {
   verifyEmailValidator,
   forgotPasswordValidator,
   verifyForgotPasswordValidator,
-  resetPasswordValidator
+  resetPasswordValidator,
+  verifyUserValidator,
+  updateMeValidator
 } from '~/middlewares/users.middlewares'
+import {
+  LoginReqBody,
+  LogoutReqBody,
+  RegsiterReqBody,
+  ResetPasswordReqBody,
+  UpdateUserReqBody,
+  VerifyEmailReqBody,
+  VerifyForgotPasswordReqBody
+} from '~/models/requests/User.request'
 import { wrapperRequestHandler } from '~/utils/handlers'
 const usersRouter = Router()
 
@@ -29,7 +44,12 @@ const usersRouter = Router()
  * Method: POST
  * body: {name: string, email: string, password: string, confirm_password: string, date_of_birth: ISO8601}
  **/
-usersRouter.post('/register', registerValidator, wrapperRequestHandler(registerController))
+usersRouter.post(
+  '/register',
+  registerValidator,
+  filterMiddleware<RegsiterReqBody>(['confirm_password', 'date_of_birth', 'email', 'name', 'password']),
+  wrapperRequestHandler(registerController)
+)
 
 /**
  * Login a user
@@ -38,7 +58,12 @@ usersRouter.post('/register', registerValidator, wrapperRequestHandler(registerC
  * Method: POST
  * body: {email: string, password: string}
  **/
-usersRouter.post('/login', loginValidator, wrapperRequestHandler(loginController))
+usersRouter.post(
+  '/login',
+  loginValidator,
+  filterMiddleware<LoginReqBody>(['email', 'password']),
+  wrapperRequestHandler(loginController)
+)
 
 /**
  * Logout a user
@@ -48,7 +73,13 @@ usersRouter.post('/login', loginValidator, wrapperRequestHandler(loginController
  * header: bearer access_token
  * body: {refesh_token: string}
  **/
-usersRouter.post('/logout', accessTokenValidator, refreshTokenValidator, wrapperRequestHandler(logoutController))
+usersRouter.post(
+  '/logout',
+  accessTokenValidator,
+  refreshTokenValidator,
+  filterMiddleware<LogoutReqBody>(['refresh_token']),
+  wrapperRequestHandler(logoutController)
+)
 
 /**
  * Verify email user
@@ -57,7 +88,12 @@ usersRouter.post('/logout', accessTokenValidator, refreshTokenValidator, wrapper
  * Method: POST
  * body: {email_verify_token: string}
  **/
-usersRouter.post('/verify-email', verifyEmailValidator, wrapperRequestHandler(verifyEmailController))
+usersRouter.post(
+  '/verify-email',
+  verifyEmailValidator,
+  filterMiddleware<VerifyEmailReqBody>(['email_verify_token']),
+  wrapperRequestHandler(verifyEmailController)
+)
 
 /**
  * Resend verify email user
@@ -87,6 +123,7 @@ usersRouter.post('/forgot-password', forgotPasswordValidator, wrapperRequestHand
 usersRouter.post(
   '/verify-forgot-password',
   verifyForgotPasswordValidator,
+  filterMiddleware<VerifyForgotPasswordReqBody>(['forgot_password_token']),
   wrapperRequestHandler(verifyForgotpasswordController)
 )
 
@@ -97,6 +134,54 @@ usersRouter.post(
  * Method: POST
  * body: {forgot-password-token: string, password: string, confirm-passowrd: string}
  **/
-usersRouter.post('/reset-password', resetPasswordValidator, wrapperRequestHandler(resetPasswordController))
+usersRouter.post(
+  '/reset-password',
+  resetPasswordValidator,
+  filterMiddleware<ResetPasswordReqBody>(['confirm_password', 'forgot_password_token', 'password']),
+  wrapperRequestHandler(resetPasswordController)
+)
+
+/**
+ * get profile me
+ *
+ * Path: /me
+ * Method: GET
+ * header: bearer access_token
+ **/
+usersRouter.get('/me', accessTokenValidator, wrapperRequestHandler(getMeController))
+
+/**
+ * update profile me
+ *
+ * Path: /me
+ * Method: PATCH
+ * header: bearer access_token
+ * body: user schema
+ **/
+usersRouter.patch(
+  '/me',
+  accessTokenValidator,
+  verifyUserValidator,
+  updateMeValidator,
+  filterMiddleware<UpdateUserReqBody>([
+    'name',
+    'date_of_birth',
+    'avatar',
+    'bio',
+    'cover_photo',
+    'website',
+    'location',
+    'username'
+  ]),
+  wrapperRequestHandler(updateMeController)
+)
+
+/**
+ * get profile user
+ *
+ * Path: /:user_name
+ * Method: GET
+ **/
+usersRouter.get('/:user_name', wrapperRequestHandler(getUserController))
 
 export default usersRouter
