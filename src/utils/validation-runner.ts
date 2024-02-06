@@ -20,13 +20,12 @@ const validationRunner = (validations: RunnableValidationChains<ValidationChain>
     }
 
     const errorsObject = errors.mapped()
-    const errorLenght = Object.keys(errorsObject).length
     const errorEntity = new ErrorEntity({ message: 'invalid value', errors: {} })
 
     for (const key in errorsObject) {
       const { msg } = errorsObject[key]
 
-      if (errorLenght === 1 && msg instanceof ErrorWithStatus && msg.status !== HTTP_STATUS.UNPROCESSABLE_ENTITY) {
+      if (msg instanceof ErrorWithStatus && msg.status !== HTTP_STATUS.UNPROCESSABLE_ENTITY) {
         return next(msg)
       }
 

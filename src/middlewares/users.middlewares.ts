@@ -97,6 +97,8 @@ const forgotPasswordSchema: ParamSchema = {
           })
         }
         ;(req as Request).decoded_forgot_password_token = decoded_forgot_password_token
+
+        return true
       } catch (error) {
         if (error instanceof JsonWebTokenError) {
           throw new ErrorWithStatus({
@@ -175,6 +177,7 @@ const idFollowerSchema: ParamSchema = {
           status: HTTP_STATUS.NOT_FOUND
         })
       }
+      return true
     }
   }
 }
@@ -310,6 +313,8 @@ export const refreshTokenValidator = validationRunner(
               }
               //add decode token to req
               ;(req as Request).decoded_refesh_token = decoded_refesh_token
+
+              return true
             } catch (error) {
               if (error instanceof JsonWebTokenError) {
                 throw new ErrorWithStatus({
@@ -351,6 +356,8 @@ export const verifyEmailValidator = validationRunner(
 
               //add decode token to req
               ;(req as Request).decoded_email_verify_token = decoded_email_verify_token
+
+              return true
             } catch (error) {
               if (error instanceof JsonWebTokenError) {
                 throw new ErrorWithStatus({
@@ -386,6 +393,8 @@ export const forgotPasswordValidator = validationRunner(
             }
 
             ;(req as Request).user = user
+
+            return true
           }
         }
       }
@@ -504,6 +513,8 @@ export const updateMeValidator = validationRunner(
                 throw new Error(USER_MESSAGES.USERNAME_IS_ALREADY_EXISTS)
               }
             }
+
+            return true
           }
         }
       },
