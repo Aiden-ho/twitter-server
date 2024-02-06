@@ -46,7 +46,10 @@ export const USER_MESSAGES = {
   WEBSITE_MUST_BE_STRING: 'Website must be string',
   WEBSITE_LENGTH_MUST_BE_FROM_1_TO_200: 'Website length must be from 1 to 200',
   USERNAME_MUST_BE_STRING: 'Username must be string',
-  USERNAME_LENGTH_MUST_BE_FROM_1_TO_50: 'Username length must be from 1 to 50',
+  USERNAME_IS_INVALID:
+    'Username must be 1-50 characters long and contain only letters, numbers, underscores, hyphens, not only numbers',
+  USERNAME_IS_ALREADY_EXISTS: 'username is already exists',
+  USERNAME_MUST_BE_DIFFERENT_FROM_THE_CURRENT: 'Username must be different from the current',
   UPDATE_ME_SUCCESSFUL: 'Update profile successful',
   GET_ME_SUCCESSFUL: 'Get me successful',
   USER_ID_IS_INVALID: 'User id is invalid',

@@ -5,6 +5,7 @@ import { ObjectId } from 'mongodb'
 import { UserVerifyStatus } from '~/constants/enum'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { USER_MESSAGES } from '~/constants/messages'
+import { REGEX_USERNAME } from '~/constants/regexs'
 import { ErrorWithStatus } from '~/models/Errors'
 import { PayloadToken } from '~/models/requests/User.request'
 import refreshTokensServices from '~/services/refreshTokens.services'
@@ -484,12 +485,22 @@ export const updateMeValidator = validationRunner(
           errorMessage: USER_MESSAGES.USERNAME_MUST_BE_STRING
         },
         trim: true,
-        isLength: {
-          options: {
-            min: 1,
-            max: 50
-          },
-          errorMessage: USER_MESSAGES.USERNAME_LENGTH_MUST_BE_FROM_1_TO_50
+        custom: {
+          options: async (value, { req }) => {
+            if (!REGEX_USERNAME.test(value)) {
+              throw new Error(USER_MESSAGES.USERNAME_IS_INVALID)
+            }
+            const { user_id } = req.decoded_authorization as PayloadToken
+            const user = await userServices.getUser({ username: value })
+
+            if (user) {
+              if (user._id.toString() === user_id) {
+                throw new Error(USER_MESSAGES.USERNAME_MUST_BE_DIFFERENT_FROM_THE_CURRENT)
+              } else {
+                throw new Error(USER_MESSAGES.USERNAME_IS_ALREADY_EXISTS)
+              }
+            }
+          }
         }
       },
       avatar: imageSchema,
