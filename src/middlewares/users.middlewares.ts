@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { ParamSchema, check, checkSchema } from 'express-validator'
+import { ParamSchema, checkSchema } from 'express-validator'
 import { JsonWebTokenError } from 'jsonwebtoken'
 import { ObjectId } from 'mongodb'
 import { UserVerifyStatus } from '~/constants/enum'
@@ -10,6 +10,7 @@ import { ErrorWithStatus } from '~/models/Errors'
 import { PayloadToken } from '~/models/requests/User.request'
 import refreshTokensServices from '~/services/refreshTokens.services'
 import userServices from '~/services/users.services'
+import { hashPassword } from '~/utils/crypto'
 import { verifyToken } from '~/utils/jwt'
 import validationRunner from '~/utils/validation-runner'
 
@@ -41,16 +42,18 @@ const passwordSchema: ParamSchema = {
   }
 }
 
-const confirmPasswordSchema: ParamSchema = {
-  notEmpty: true,
-  isString: true,
-  trim: true,
-  custom: {
-    options: (value, { req }) => {
-      if (value !== req.body.password) {
-        throw new Error(USER_MESSAGES.CONFIRM_PASSWORD_IS_NOT_MATCH)
+const getConfirmPasswordSchema = (key: string): ParamSchema => {
+  return {
+    notEmpty: true,
+    isString: true,
+    trim: true,
+    custom: {
+      options: (value, { req }) => {
+        if (value !== req.body[key]) {
+          throw new Error(USER_MESSAGES.CONFIRM_PASSWORD_IS_NOT_MATCH)
+        }
+        return true
       }
-      return true
     }
   }
 }
@@ -93,7 +96,7 @@ const forgotPasswordSchema: ParamSchema = {
             status: HTTP_STATUS.UNAUTHORIZED
           })
         }
-        req.decoded_forgot_password_token = decoded_forgot_password_token
+        ;(req as Request).decoded_forgot_password_token = decoded_forgot_password_token
       } catch (error) {
         if (error instanceof JsonWebTokenError) {
           throw new ErrorWithStatus({
@@ -229,7 +232,7 @@ export const registerValidator = validationRunner(
         }
       },
       password: passwordSchema,
-      confirm_password: confirmPasswordSchema,
+      confirm_password: getConfirmPasswordSchema('password'),
       date_of_birth: dateOfBirthSchema
     },
     ['body']
@@ -259,6 +262,7 @@ export const accessTokenValidator = validationRunner(
               })
               //add decode token to req
               ;(req as Request).decoded_authorization = decoded_authorization
+              return true
             } catch (error) {
               if (error instanceof JsonWebTokenError) {
                 throw new ErrorWithStatus({
@@ -403,7 +407,7 @@ export const resetPasswordValidator = validationRunner(
   checkSchema(
     {
       password: passwordSchema,
-      confirm_password: confirmPasswordSchema,
+      confirm_password: getConfirmPasswordSchema('password'),
       forgot_password_token: forgotPasswordSchema
     },
     ['body']
@@ -525,5 +529,43 @@ export const unfollowerValidator = validationRunner(
       user_id: idFollowerSchema
     },
     ['params']
+  )
+)
+
+export const changePasswordValidator = validationRunner(
+  checkSchema(
+    {
+      old_password: {
+        notEmpty: {
+          errorMessage: USER_MESSAGES.PASSWORD_IS_REQUIRED
+        },
+        isString: {
+          errorMessage: USER_MESSAGES.PASSWORD_MUST_BE_A_STRING
+        },
+        trim: true,
+        custom: {
+          options: async (value, { req }) => {
+            const { user_id } = (req as Request).decoded_authorization as PayloadToken
+            const user = await userServices.getFullUser(user_id)
+
+            if (!user) {
+              throw new ErrorWithStatus({ message: USER_MESSAGES.USER_NOT_FOUND, status: HTTP_STATUS.NOT_FOUND })
+            }
+
+            if (user.password !== hashPassword(value)) {
+              throw new ErrorWithStatus({
+                message: USER_MESSAGES.OLD_PASSWORD_INCORRECT,
+                status: HTTP_STATUS.UNAUTHORIZED
+              })
+            }
+
+            return true
+          }
+        }
+      },
+      new_password: passwordSchema,
+      confirm_new_password: getConfirmPasswordSchema('new_password')
+    },
+    ['body']
   )
 )

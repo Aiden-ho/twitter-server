@@ -17,7 +17,8 @@ import {
   UpdateUserReqBody,
   GetProfileReqParams,
   FollowReqBody,
-  UnFollowReqParams
+  UnFollowReqParams,
+  ChangePasswordReqBody
 } from '~/models/requests/User.request'
 import User from '~/models/schemas/User.schema'
 import followerServices from '~/services/followers.services'
@@ -193,4 +194,16 @@ export const unFollowUserController = async (req: Request<UnFollowReqParams>, re
   await followerServices.delete(user_id, followed_user_id)
 
   return res.json({ message: USER_MESSAGES.UNFOLLOW_SUCCESSFUL })
+}
+
+export const changePasswordController = async (
+  req: Request<ParamsDictionary, any, ChangePasswordReqBody>,
+  res: Response
+) => {
+  const { user_id } = req.decoded_authorization as PayloadToken
+  const { new_password } = req.body
+
+  await userServices.changePassword(user_id, new_password)
+
+  return res.json({ message: USER_MESSAGES.CHANGE_PASSWORD_SUCCESSFUL })
 }

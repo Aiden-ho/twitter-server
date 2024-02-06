@@ -1,5 +1,3 @@
-import omitBy from 'lodash/omitBy'
-import isNil from 'lodash/isNil'
 import isEmpty from 'lodash/isEmpty'
 import { RegsiterReqBody, UpdateUserReqBody } from '~/models/requests/User.request'
 import databaseServices from './database.services'
@@ -124,6 +122,11 @@ class UserServices {
     return user
   }
 
+  async getFullUser(user_id: string) {
+    const user = await databaseServices.users.findOne({ _id: new ObjectId(user_id) })
+    return user
+  }
+
   async verifyEmail(user_id: string) {
     const [tokens] = await Promise.all([
       this.signTokens({ user_id, verify: UserVerifyStatus.Verified }),
@@ -222,6 +225,13 @@ class UserServices {
     )
 
     return result
+  }
+
+  async changePassword(user_id: string, new_password: string) {
+    await databaseServices.users.updateOne(
+      { _id: new ObjectId(user_id) },
+      { $set: { password: hashPassword(new_password) } }
+    )
   }
 }
 
