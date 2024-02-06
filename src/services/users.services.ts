@@ -141,6 +141,7 @@ class UserServices {
       )
     ])
     const [access_token, refresh_token] = tokens
+    refreshTokensServices.save(user_id, refresh_token as string)
     return {
       access_token,
       refresh_token
