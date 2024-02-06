@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
-import { ParamSchema, checkSchema } from 'express-validator'
+import { ParamSchema, check, checkSchema } from 'express-validator'
 import { JsonWebTokenError } from 'jsonwebtoken'
+import { ObjectId } from 'mongodb'
 import { UserVerifyStatus } from '~/constants/enum'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { USER_MESSAGES } from '~/constants/messages'
@@ -148,6 +149,29 @@ const imageSchema: ParamSchema = {
       max: 400
     },
     errorMessage: USER_MESSAGES.IMAGE_URL_LENGTH_MUST_BE_FROM_1_TO_400
+  }
+}
+
+const idFollowerSchema: ParamSchema = {
+  trim: true,
+  custom: {
+    options: async (value, { req }) => {
+      if (!ObjectId.isValid(value)) {
+        throw new ErrorWithStatus({
+          message: USER_MESSAGES.USER_ID_IS_INVALID,
+          status: HTTP_STATUS.NOT_FOUND
+        })
+      }
+
+      const followed_user = await userServices.getUser({ _id: value })
+
+      if (!followed_user) {
+        throw new ErrorWithStatus({
+          message: USER_MESSAGES.USER_NOT_FOUND,
+          status: HTTP_STATUS.NOT_FOUND
+        })
+      }
+    }
   }
 }
 
@@ -472,5 +496,23 @@ export const updateMeValidator = validationRunner(
       cover_photo: imageSchema
     },
     ['body']
+  )
+)
+
+export const followerValidator = validationRunner(
+  checkSchema(
+    {
+      followed_user_id: idFollowerSchema
+    },
+    ['body']
+  )
+)
+
+export const unfollowerValidator = validationRunner(
+  checkSchema(
+    {
+      user_id: idFollowerSchema
+    },
+    ['params']
   )
 )

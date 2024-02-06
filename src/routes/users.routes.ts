@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import {
+  followUserController,
   forgotPasswordController,
   getMeController,
   getUserController,
@@ -8,6 +9,7 @@ import {
   registerController,
   resendVerifyEmailController,
   resetPasswordController,
+  unFollowUserController,
   updateMeController,
   verifyEmailController,
   verifyForgotpasswordController
@@ -23,9 +25,12 @@ import {
   verifyForgotPasswordValidator,
   resetPasswordValidator,
   verifyUserValidator,
-  updateMeValidator
+  updateMeValidator,
+  followerValidator,
+  unfollowerValidator
 } from '~/middlewares/users.middlewares'
 import {
+  FollowReqBody,
   LoginReqBody,
   LogoutReqBody,
   RegsiterReqBody,
@@ -183,5 +188,37 @@ usersRouter.patch(
  * Method: GET
  **/
 usersRouter.get('/:user_name', wrapperRequestHandler(getUserController))
+
+/**
+ * follow user
+ *
+ * Path: /follow
+ * Method: POST
+ * header: bearer access_token
+ * body: {followed_user_id: string}
+ **/
+usersRouter.post(
+  '/follow',
+  accessTokenValidator,
+  verifyUserValidator,
+  followerValidator,
+  filterMiddleware<FollowReqBody>(['followed_user_id']),
+  wrapperRequestHandler(followUserController)
+)
+
+/**
+ * unfollow user
+ *
+ * Path: /follow/:user_id
+ * Method: DELETE
+ * header: bearer access_token
+ **/
+usersRouter.delete(
+  '/follow/:user_id',
+  accessTokenValidator,
+  verifyUserValidator,
+  unfollowerValidator,
+  wrapperRequestHandler(unFollowUserController)
+)
 
 export default usersRouter

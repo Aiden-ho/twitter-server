@@ -1,5 +1,6 @@
 import { JwtPayload } from 'jsonwebtoken'
 import { TokenType } from '~/constants/enum'
+import { ParamsDictionary } from 'express-serve-static-core'
 
 export interface LoginReqBody {
   email: string
@@ -54,4 +55,13 @@ export interface UpdateUserReqBody {
 
 export interface GetProfileReqParams {
   user_name: string
+}
+
+export interface FollowReqBody {
+  followed_user_id: string
+}
+
+// fix error TS2769 by extends ParamsDictionary
+export interface UnFollowReqParams extends ParamsDictionary {
+  user_id: string
 }

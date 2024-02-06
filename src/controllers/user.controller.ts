@@ -1,6 +1,5 @@
 import { Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
-import { Http2ServerResponse } from 'http2'
 import { ObjectId } from 'mongodb'
 import { UserVerifyStatus } from '~/constants/enum'
 import HTTP_STATUS from '~/constants/httpStatus'
@@ -16,9 +15,12 @@ import {
   VerifyForgotPasswordReqBody,
   ResetPasswordReqBody,
   UpdateUserReqBody,
-  GetProfileReqParams
+  GetProfileReqParams,
+  FollowReqBody,
+  UnFollowReqParams
 } from '~/models/requests/User.request'
 import User from '~/models/schemas/User.schema'
+import followerServices from '~/services/followers.services'
 import refreshTokensServices from '~/services/refreshTokens.services'
 import userServices from '~/services/users.services'
 
@@ -162,4 +164,33 @@ export const getUserController = async (req: Request<GetProfileReqParams>, res: 
     message: USER_MESSAGES.GET_PROFILE_SUCCESSFUL,
     result
   })
+}
+
+export const followUserController = async (req: Request<ParamsDictionary, any, FollowReqBody>, res: Response) => {
+  const { user_id } = req.decoded_authorization as PayloadToken
+  const { followed_user_id } = req.body
+
+  const isFollowed = await followerServices.checkFollowed(user_id, followed_user_id)
+
+  if (isFollowed) {
+    return res.json({ message: USER_MESSAGES.ALREADY_FOLLOWED })
+  }
+
+  await followerServices.save(user_id, followed_user_id)
+
+  return res.json({ message: USER_MESSAGES.FOLLOW_SUCCESSFUL })
+}
+
+export const unFollowUserController = async (req: Request<UnFollowReqParams>, res: Response) => {
+  const { user_id } = req.decoded_authorization as PayloadToken
+  const { user_id: followed_user_id } = req.params
+  const isFollowed = await followerServices.checkFollowed(user_id, followed_user_id)
+
+  if (!isFollowed) {
+    return res.json({ message: USER_MESSAGES.ALREADY_UNFOLLOWED })
+  }
+
+  await followerServices.delete(user_id, followed_user_id)
+
+  return res.json({ message: USER_MESSAGES.UNFOLLOW_SUCCESSFUL })
 }
