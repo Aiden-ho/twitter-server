@@ -23,6 +23,7 @@ export const USER_MESSAGES = {
   EMAIL_VERIFY_TOKEN_IS_REQUIRED: 'Email verify token is requried',
   EMAIL_VERIFY_TOKEN_IS_INVALID: 'Email verify is invalid',
   EMAIL_IS_VERIFIED: 'Email is verified',
+  EMAIL_IS_UNVERIFIED: 'Email is unverified',
   RESEND_EMAIL_VERIFY_SUCCESS: 'Resend email verify successful',
   USER_NOT_FOUND: 'User not found',
   EMAIL_VERIFY_SUCCESSFUL: 'Email verify successful',
@@ -58,5 +59,6 @@ export const USER_MESSAGES = {
   FOLLOW_SUCCESSFUL: 'Follow successful',
   UNFOLLOW_SUCCESSFUL: 'Unfollow successful',
   OLD_PASSWORD_INCORRECT: 'Password incorrect',
-  CHANGE_PASSWORD_SUCCESSFUL: 'Change password successful'
+  CHANGE_PASSWORD_SUCCESSFUL: 'Change password successful',
+  GMAIL_IS_UNVERIFIED: 'Gmail is unverified'
 } as const

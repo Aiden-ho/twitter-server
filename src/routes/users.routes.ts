@@ -6,6 +6,7 @@ import {
   getMeController,
   getUserController,
   loginController,
+  loginOauthController,
   logoutController,
   registerController,
   resendVerifyEmailController,
@@ -72,6 +73,15 @@ usersRouter.post(
   filterMiddleware<LoginReqBody>(['email', 'password']),
   wrapperRequestHandler(loginController)
 )
+
+/**
+ * Login a user with Google Oauth 2.0
+ *
+ * Path: /oauth/google
+ * Method: get
+ * query: {code: string, scope: string...}
+ **/
+usersRouter.get('/oauth/google', wrapperRequestHandler(loginOauthController))
 
 /**
  * Logout a user

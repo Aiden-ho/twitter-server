@@ -24,6 +24,7 @@ import User from '~/models/schemas/User.schema'
 import followerServices from '~/services/followers.services'
 import refreshTokensServices from '~/services/refreshTokens.services'
 import userServices from '~/services/users.services'
+import { randomPassword } from '~/utils/crypto'
 
 export const loginController = async (req: Request<ParamsDictionary, any, LoginReqBody>, res: Response) => {
   const user = req.user as User
@@ -34,6 +35,51 @@ export const loginController = async (req: Request<ParamsDictionary, any, LoginR
     message: USER_MESSAGES.LOGIN_SUCCESSFUL,
     result
   })
+}
+
+export const loginOauthController = async (req: Request, res: Response) => {
+  const { code } = req.query
+  const { verified_email, email, name } = await userServices.oauth(code as string)
+  let new_user: boolean
+  let verify: UserVerifyStatus
+  let result: {
+    access_token: string
+    refresh_token: string
+  }
+
+  //check xem gmail có verify chưa
+  if (!verified_email) {
+    throw new ErrorWithStatus({
+      message: USER_MESSAGES.GMAIL_IS_UNVERIFIED,
+      status: HTTP_STATUS.BAD_REQUEST
+    })
+  }
+
+  //Check xem gmail này đã dùng để tạo user hay chưa
+  const user = await userServices.getUser({ email })
+
+  if (user) {
+    //Nếu có rồi thì đăng nhập
+    result = await userServices.login({ user_id: user._id.toString(), verify: user.verify })
+    new_user = false
+    verify = user.verify
+  } else {
+    //Nếu chưa có thì đăng kí
+    const password = await randomPassword(8)
+    result = await userServices.register({
+      password: password,
+      confirm_password: password,
+      date_of_birth: new Date().toISOString(),
+      email,
+      name
+    })
+    new_user = true
+    verify = UserVerifyStatus.Unverified
+  }
+
+  const redirectUrl = `${process.env.CLIENT_REDIRECT_CALLBACK}?access_token=${result.access_token}&refresh_token=${result.refresh_token}&new_user=${new_user}&verify=${verify}`
+
+  res.redirect(redirectUrl)
 }
 
 export const registerController = async (req: Request<ParamsDictionary, any, RegsiterReqBody>, res: Response) => {

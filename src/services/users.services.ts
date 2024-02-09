@@ -1,3 +1,4 @@
+import axios from 'axios'
 import isEmpty from 'lodash/isEmpty'
 import { RegsiterReqBody, UpdateUserReqBody } from '~/models/requests/User.request'
 import databaseServices from './database.services'
@@ -42,8 +43,50 @@ class UserServices {
     })
   }
 
-  private signTokens({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
+  private signAccessAndRefreshTokens({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
     return Promise.all([this.signAccessToken({ user_id, verify }), this.signRefreshToken({ user_id, verify })])
+  }
+
+  private async getOauthGoogleToken(code: string) {
+    const body = {
+      code,
+      client_id: process.env.GOOGLE_CLIENT_ID,
+      client_secret: process.env.GOOGLE_CLIENT_SECRET,
+      redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+      access_type: 'offline',
+      grant_type: 'authorization_code'
+    }
+
+    const { data } = await axios.post('https://oauth2.googleapis.com/token', body, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    })
+
+    return data as {
+      access_token: string
+      id_token: string
+    }
+  }
+
+  private async getGoogleUser(access_token: string, id_token: string) {
+    const { data } = await axios.get('https://www.googleapis.com/oauth2/v1/userinfo', {
+      params: {
+        id_token,
+        alt: 'json'
+      },
+      headers: {
+        Authorization: 'Bearer ' + access_token
+      }
+    })
+
+    return data as {
+      id: string
+      email: string
+      verified_email: boolean
+      name: string
+      picture: string
+    }
   }
 
   async register(payload: RegsiterReqBody) {
@@ -62,7 +105,7 @@ class UserServices {
       })
     )
 
-    const [access_token, refresh_token] = await this.signTokens({
+    const [access_token, refresh_token] = await this.signAccessAndRefreshTokens({
       user_id: user_id.toString(),
       verify: UserVerifyStatus.Unverified
     })
@@ -77,7 +120,7 @@ class UserServices {
   }
 
   async login({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
-    const [access_token, refresh_token] = await this.signTokens({ user_id, verify })
+    const [access_token, refresh_token] = await this.signAccessAndRefreshTokens({ user_id, verify })
     refreshTokensServices.save(user_id, refresh_token as string)
     return {
       access_token,
@@ -129,7 +172,7 @@ class UserServices {
 
   async verifyEmail(user_id: string) {
     const [tokens] = await Promise.all([
-      this.signTokens({ user_id, verify: UserVerifyStatus.Verified }),
+      this.signAccessAndRefreshTokens({ user_id, verify: UserVerifyStatus.Verified }),
       databaseServices.users.updateOne(
         { _id: new ObjectId(user_id) },
         {
@@ -233,6 +276,12 @@ class UserServices {
       { _id: new ObjectId(user_id) },
       { $set: { password: hashPassword(new_password) } }
     )
+  }
+
+  async oauth(code: string) {
+    const { access_token, id_token } = await this.getOauthGoogleToken(code)
+    const user = await this.getGoogleUser(access_token, id_token)
+    return user
   }
 }
 
