@@ -60,5 +60,10 @@ export const USER_MESSAGES = {
   UNFOLLOW_SUCCESSFUL: 'Unfollow successful',
   OLD_PASSWORD_INCORRECT: 'Password incorrect',
   CHANGE_PASSWORD_SUCCESSFUL: 'Change password successful',
-  GMAIL_IS_UNVERIFIED: 'Gmail is unverified'
+  GMAIL_IS_UNVERIFIED: 'Gmail is unverified',
+  FILE_TYPE_IS_INVALID: 'File type is invalid',
+  FILE_IS_EMPTY: 'File is empty',
+  NOT_FOUND: 'Not found',
+  UPLOAD_IMAGES_SUCCESSFUL: 'upload images successful',
+  UPLOAD_VIDEO_SUCCESSFUL: 'upload video successful'
 } as const
