@@ -64,6 +64,7 @@ export const USER_MESSAGES = {
   FILE_TYPE_IS_INVALID: 'File type is invalid',
   FILE_IS_EMPTY: 'File is empty',
   NOT_FOUND: 'Not found',
-  UPLOAD_IMAGES_SUCCESSFUL: 'upload images successful',
-  UPLOAD_VIDEO_SUCCESSFUL: 'upload video successful'
+  UPLOAD_IMAGES_SUCCESSFUL: 'Upload images successful',
+  UPLOAD_VIDEO_SUCCESSFUL: 'Upload video successful',
+  REFRESH_TOKEN_SUCCESSFUL: 'Refresh Token successful'
 } as const
