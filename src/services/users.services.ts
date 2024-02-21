@@ -128,6 +128,15 @@ class UserServices {
     }
   }
 
+  async refreshToken({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
+    const [access_token, refresh_token] = await this.signAccessAndRefreshTokens({ user_id, verify })
+
+    return {
+      access_token,
+      refresh_token
+    }
+  }
+
   async checkEmailExist(email: string) {
     const user = await databaseServices.users.findOne({ email })
     return Boolean(user)

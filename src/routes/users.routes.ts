@@ -8,6 +8,7 @@ import {
   loginController,
   loginOauthController,
   logoutController,
+  refreshTokenController,
   registerController,
   resendVerifyEmailController,
   resetPasswordController,
@@ -98,6 +99,15 @@ usersRouter.post(
   filterMiddleware<LogoutReqBody>(['refresh_token']),
   wrapperRequestHandler(logoutController)
 )
+
+/**
+ * Refresh Token
+ *
+ * Path: /refresh-token
+ * Method: POST
+ * body: {refesh_token: string}
+ **/
+usersRouter.post('/refresh-token', refreshTokenValidator, wrapperRequestHandler(refreshTokenController))
 
 /**
  * Verify email user

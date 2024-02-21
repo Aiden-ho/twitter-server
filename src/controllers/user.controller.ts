@@ -18,7 +18,8 @@ import {
   GetProfileReqParams,
   FollowReqBody,
   UnFollowReqParams,
-  ChangePasswordReqBody
+  ChangePasswordReqBody,
+  RefreshTokenReqBody
 } from '~/models/requests/User.request'
 import User from '~/models/schemas/User.schema'
 import followerServices from '~/services/followers.services'
@@ -95,6 +96,24 @@ export const logoutController = async (req: Request<ParamsDictionary, any, Logou
   await refreshTokensServices.delete(refresh_token)
   return res.json({
     message: USER_MESSAGES.LOGOUT_SUCCESSFULL
+  })
+}
+
+export const refreshTokenController = async (
+  req: Request<ParamsDictionary, any, RefreshTokenReqBody>,
+  res: Response
+) => {
+  const { user_id, verify } = req.decoded_refesh_token as PayloadToken
+  const refresh_token = req.body.refresh_token
+  const result = await userServices.refreshToken({ user_id, verify })
+  await Promise.all([
+    refreshTokensServices.delete(refresh_token),
+    refreshTokensServices.save(user_id, result.refresh_token)
+  ])
+
+  return res.json({
+    message: USER_MESSAGES.REFRESH_TOKEN_SUCCESSFUL,
+    result
   })
 }
 
