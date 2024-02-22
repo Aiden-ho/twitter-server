@@ -15,3 +15,10 @@ export enum MediaType {
   Image,
   Video
 }
+
+export enum VideoEncodingStatus {
+  Pending,
+  Processing,
+  Succeed,
+  Failed
+}

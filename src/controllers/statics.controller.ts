@@ -2,11 +2,12 @@ import { Request, Response } from 'express'
 import fs from 'fs'
 import mime from 'mime'
 import path from 'path'
-import { UPLOAD_IMAGE_DIR, UPLOAD_VIDEO_DIR, UPLOAD_VIDEO_TEMP_DIR } from '~/constants/dir'
+import { UPLOAD_IMAGE_DIR, UPLOAD_VIDEO_DIR } from '~/constants/dir'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { USER_MESSAGES } from '~/constants/messages'
+import { ServeImageReqParams, ServeM3u8ReqParams, ServeSegmentReqParams } from '~/models/requests/media.request'
 
-export const serveImageController = (req: Request, res: Response) => {
+export const serveImageController = (req: Request<ServeImageReqParams>, res: Response) => {
   const { filename } = req.params
 
   return res.sendFile(path.resolve(UPLOAD_IMAGE_DIR, filename), (error) => {
@@ -24,7 +25,7 @@ export const serveVideoStreamingController = (req: Request, res: Response) => {
   }
 
   const { filename } = req.params
-  const videoPath = path.resolve(UPLOAD_VIDEO_TEMP_DIR, filename)
+  const videoPath = path.resolve(UPLOAD_VIDEO_DIR, filename)
 
   //1Mb = 10^6 bytes (theo hệ thập phân, format ta thường thấy hiển thị trên UI, ví dụ như progress...)
   // Nếu theo hệ nhi phân thì 1Mb =  2 ^ 20 (1024 * 1024)
@@ -78,4 +79,24 @@ export const serveVideoStreamingController = (req: Request, res: Response) => {
 
   const videoStream = fs.createReadStream(videoPath, { start, end })
   videoStream.pipe(res)
+}
+
+export const serveM3u8Controller = (req: Request<ServeM3u8ReqParams>, res: Response) => {
+  const id = req.params.id
+
+  return res.sendFile(path.resolve(UPLOAD_VIDEO_DIR, id, 'master.m3u8'), (error) => {
+    if (error) {
+      res.status((error as any).status).send(USER_MESSAGES.NOT_FOUND)
+    }
+  })
+}
+
+export const serveSegmentController = (req: Request<ServeSegmentReqParams>, res: Response) => {
+  const { id, v, segment } = req.params
+
+  return res.sendFile(path.resolve(UPLOAD_VIDEO_DIR, id, v, segment), (error) => {
+    if (error) {
+      res.status((error as any).status).send(USER_MESSAGES.NOT_FOUND)
+    }
+  })
 }

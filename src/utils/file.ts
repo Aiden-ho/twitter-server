@@ -1,8 +1,9 @@
 import fs from 'fs'
 import formidable, { File, Part } from 'formidable'
 import { Request } from 'express'
-import { UPLOAD_IMAGE_TEMP_DIR, UPLOAD_VIDEO_TEMP_DIR } from '~/constants/dir'
+import { UPLOAD_IMAGE_TEMP_DIR, UPLOAD_VIDEO_DIR, UPLOAD_VIDEO_TEMP_DIR } from '~/constants/dir'
 import { USER_MESSAGES } from '~/constants/messages'
+import path from 'path'
 
 export const initFolder = () => {
   ;[UPLOAD_IMAGE_TEMP_DIR, UPLOAD_VIDEO_TEMP_DIR].forEach((dir) => {
@@ -48,9 +49,13 @@ export const uploadImages = (req: Request) => {
   })
 }
 
-export const uploadVideos = (req: Request) => {
+export const uploadVideos = async (req: Request) => {
+  const nanoId = (await import('nanoid')).nanoid
+  const idName = nanoId()
+  //Mỗi video có 1 thư mục riêng theo tên của video đó
+  fs.mkdirSync(path.resolve(UPLOAD_VIDEO_DIR, idName))
   const form = formidable({
-    uploadDir: UPLOAD_VIDEO_TEMP_DIR,
+    uploadDir: path.resolve(UPLOAD_VIDEO_DIR, idName),
     maxFiles: 1,
     maxFileSize: 50 * 1024 * 1024, //50MB,
     filter: ({ name, originalFilename, mimetype }: Part) => {
@@ -62,7 +67,8 @@ export const uploadVideos = (req: Request) => {
       }
 
       return valid
-    }
+    },
+    filename: () => idName
   })
 
   return new Promise<File[]>((resolve, reject) => {
@@ -81,6 +87,7 @@ export const uploadVideos = (req: Request) => {
         const ext = getExtensionFormFileName(video.originalFilename as string)
         fs.renameSync(video.filepath, video.filepath + '.' + ext)
         video.newFilename = video.newFilename + '.' + ext
+        video.filepath = video.filepath + '.' + ext
       })
 
       resolve(videos)

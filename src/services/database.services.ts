@@ -2,6 +2,7 @@ import { MongoClient, Db, Collection } from 'mongodb'
 import Follower from '~/models/schemas/Follower.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import User from '~/models/schemas/User.schema'
+import VideoStatus from '~/models/schemas/VideoStatus.schema'
 
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@twitter.iap5xxj.mongodb.net/?retryWrites=true&w=majority`
 
@@ -38,6 +39,10 @@ class DatabaseServices {
 
   get followers(): Collection<Follower> {
     return this.db.collection(process.env.DB_FOLLOWERS_COLLECTION as string)
+  }
+
+  get videosStatus(): Collection<VideoStatus> {
+    return this.db.collection(process.env.DB_VIDEOS_STATUS_COLLECTION as string)
   }
 }
 
