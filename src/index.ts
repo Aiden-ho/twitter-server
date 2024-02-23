@@ -15,7 +15,13 @@ const port = process.env.PORT || '4000'
 app.use(express.json())
 
 //database connection
-databaseServices.connect()
+databaseServices.connect().then(() => {
+  //Tạo index sau khi connect
+  databaseServices.indexUser()
+  databaseServices.indexRefreshToken()
+  databaseServices.indexVideosStatus()
+  databaseServices.indexFollowers()
+})
 
 //CORS
 app.use(cors())
