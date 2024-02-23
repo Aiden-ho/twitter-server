@@ -19,11 +19,11 @@ class UserServices {
     })
   }
 
-  private signRefreshToken({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
+  private signRefreshToken({ user_id, verify, exp }: { user_id: string; verify: UserVerifyStatus; exp?: number }) {
     return signToken({
-      payload: { user_id, token_type: TokenType.AccessToken, verify },
+      payload: { user_id, token_type: TokenType.AccessToken, verify, ...(exp && { exp }) },
       privateKey: process.env.JWT_SERCRET_REFRESH_TOKEN as string,
-      options: { expiresIn: process.env.REFRESH_TOKEN_EXPIRED }
+      ...(!exp && { options: { expiresIn: process.env.REFRESH_TOKEN_EXPIRED } })
     })
   }
 
@@ -43,8 +43,16 @@ class UserServices {
     })
   }
 
-  private signAccessAndRefreshTokens({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
-    return Promise.all([this.signAccessToken({ user_id, verify }), this.signRefreshToken({ user_id, verify })])
+  private signAccessAndRefreshTokens({
+    user_id,
+    verify,
+    exp
+  }: {
+    user_id: string
+    verify: UserVerifyStatus
+    exp?: number
+  }) {
+    return Promise.all([this.signAccessToken({ user_id, verify }), this.signRefreshToken({ user_id, verify, exp })])
   }
 
   private async getOauthGoogleToken(code: string) {
@@ -99,6 +107,7 @@ class UserServices {
       new User({
         ...payload,
         _id: user_id,
+        username: `user_${user_id.toString()}`,
         date_of_birth: new Date(payload.date_of_birth),
         password: hashPassword(payload.password),
         email_verify_token
@@ -128,8 +137,8 @@ class UserServices {
     }
   }
 
-  async refreshToken({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
-    const [access_token, refresh_token] = await this.signAccessAndRefreshTokens({ user_id, verify })
+  async refreshToken({ user_id, verify, exp }: { user_id: string; verify: UserVerifyStatus; exp?: number }) {
+    const [access_token, refresh_token] = await this.signAccessAndRefreshTokens({ user_id, verify, exp })
 
     return {
       access_token,

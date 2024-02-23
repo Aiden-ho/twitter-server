@@ -103,9 +103,9 @@ export const refreshTokenController = async (
   req: Request<ParamsDictionary, any, RefreshTokenReqBody>,
   res: Response
 ) => {
-  const { user_id, verify } = req.decoded_refesh_token as PayloadToken
+  const { user_id, verify, exp } = req.decoded_refesh_token as PayloadToken
   const refresh_token = req.body.refresh_token
-  const result = await userServices.refreshToken({ user_id, verify })
+  const result = await userServices.refreshToken({ user_id, verify, exp })
   await Promise.all([
     refreshTokensServices.delete(refresh_token),
     refreshTokensServices.save(user_id, result.refresh_token)
