@@ -5,7 +5,7 @@ import path from 'path'
 import { UPLOAD_IMAGE_DIR, UPLOAD_VIDEO_DIR } from '~/constants/dir'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { USER_MESSAGES } from '~/constants/messages'
-import { ServeImageReqParams, ServeM3u8ReqParams, ServeSegmentReqParams } from '~/models/requests/media.request'
+import { ServeImageReqParams, ServeM3u8ReqParams, ServeSegmentReqParams } from '~/models/requests/Media.request'
 
 export const serveImageController = (req: Request<ServeImageReqParams>, res: Response) => {
   const { filename } = req.params

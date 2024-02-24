@@ -1,6 +1,8 @@
 import { MongoClient, Db, Collection } from 'mongodb'
+import Bookmark from '~/models/schemas/Bookmark.schema'
 import Follower from '~/models/schemas/Follower.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
+import Tweet from '~/models/schemas/Tweet.schema'
 import User from '~/models/schemas/User.schema'
 import VideoStatus from '~/models/schemas/VideoStatus.schema'
 
@@ -74,6 +76,18 @@ class DatabaseServices {
 
   get videosStatus(): Collection<VideoStatus> {
     return this.db.collection(process.env.DB_VIDEOS_STATUS_COLLECTION as string)
+  }
+
+  get tweets(): Collection<Tweet> {
+    return this.db.collection(process.env.DB_TWEETS_COLLECTION as string)
+  }
+
+  get hashtags(): Collection<Tweet> {
+    return this.db.collection(process.env.DB_HASHTAGS_COLLECTION as string)
+  }
+
+  get bookmarks(): Collection<Bookmark> {
+    return this.db.collection(process.env.DB_BOOKMARKS_COLLECTION as string)
   }
 }
 

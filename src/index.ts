@@ -6,7 +6,9 @@ import databaseServices from './services/database.services'
 import { ErrorDefaultHandler } from './middlewares/errors.middlewares'
 import mediasRouter from './routes/medias.routes'
 import { initFolder } from './utils/file'
-import staticRouter from './routes/statics.route'
+import staticRouter from './routes/statics.routes'
+import tweetsRouter from './routes/tweets.routes'
+import bookmarksRouter from './routes/bookmarks.routes'
 
 const app = express()
 const port = process.env.PORT || '4000'
@@ -37,6 +39,12 @@ app.use('/medias', mediasRouter)
 
 // handle routing serve static file
 app.use('/static', staticRouter)
+
+// handle routing tweet
+app.use('/tweets', tweetsRouter)
+
+// handle routing tweet
+app.use('/bookmarks', bookmarksRouter)
 
 //default error handler for app
 app.use(ErrorDefaultHandler)
