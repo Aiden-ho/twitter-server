@@ -580,3 +580,15 @@ export const changePasswordValidator = validationRunner(
     ['body']
   )
 )
+
+//Kiểm tra xem đã login chưa mới chạy middleware
+// Dành cho những endpoint log in hay ko cũng xài được
+export const isLogedInValidator =
+  (middleware: (req: Request, res: Response, next: NextFunction) => void) =>
+  (req: Request, res: Response, next: NextFunction) => {
+    if (req.headers.authorization) {
+      return middleware(req, res, next)
+    }
+
+    next()
+  }

@@ -11,3 +11,7 @@ export interface CreateTweetReqBody {
   mentions: string[]
   medias: Media[]
 }
+
+export interface GetTweetReqBody {
+  tweet_id: string
+}
