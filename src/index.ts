@@ -9,6 +9,7 @@ import { initFolder } from './utils/file'
 import staticRouter from './routes/statics.routes'
 import tweetsRouter from './routes/tweets.routes'
 import bookmarksRouter from './routes/bookmarks.routes'
+import likesRouter from './routes/likes.routes'
 
 const app = express()
 const port = process.env.PORT || '4000'
@@ -43,8 +44,11 @@ app.use('/static', staticRouter)
 // handle routing tweet
 app.use('/tweets', tweetsRouter)
 
-// handle routing tweet
+// handle routing bookmark tweet
 app.use('/bookmarks', bookmarksRouter)
+
+// handle routing like tweet
+app.use('/likes', likesRouter)
 
 //default error handler for app
 app.use(ErrorDefaultHandler)
