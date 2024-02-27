@@ -1,6 +1,6 @@
 import axios from 'axios'
 import isEmpty from 'lodash/isEmpty'
-import { RegsiterReqBody, UpdateUserReqBody } from '~/models/requests/User.request'
+import { RegisterReqBody, UpdateUserReqBody } from '~/models/requests/User.request'
 import databaseServices from './database.services'
 import User from '~/models/schemas/User.schema'
 import { hashPassword } from '~/utils/crypto'
@@ -97,7 +97,7 @@ class UserServices {
     }
   }
 
-  async register(payload: RegsiterReqBody) {
+  async register(payload: RegisterReqBody) {
     const user_id = new ObjectId()
     const email_verify_token = await this.signEmailVerifyToken({
       user_id: user_id.toString(),

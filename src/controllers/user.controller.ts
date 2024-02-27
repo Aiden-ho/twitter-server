@@ -7,7 +7,7 @@ import { USER_MESSAGES } from '~/constants/messages'
 import { ErrorWithStatus } from '~/models/Errors'
 import {
   LogoutReqBody,
-  RegsiterReqBody,
+  RegisterReqBody,
   PayloadToken,
   VerifyEmailReqBody,
   LoginReqBody,
@@ -83,7 +83,7 @@ export const loginOauthController = async (req: Request, res: Response) => {
   res.redirect(redirectUrl)
 }
 
-export const registerController = async (req: Request<ParamsDictionary, any, RegsiterReqBody>, res: Response) => {
+export const registerController = async (req: Request<ParamsDictionary, any, RegisterReqBody>, res: Response) => {
   const result = await userServices.register(req.body)
   return res.json({
     message: USER_MESSAGES.REGISTER_SUCCESSFULL,

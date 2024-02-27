@@ -38,7 +38,7 @@ import {
   FollowReqBody,
   LoginReqBody,
   LogoutReqBody,
-  RegsiterReqBody,
+  RegisterReqBody,
   ResetPasswordReqBody,
   UpdateUserReqBody,
   VerifyEmailReqBody,
@@ -57,7 +57,7 @@ const usersRouter = Router()
 usersRouter.post(
   '/register',
   registerValidator,
-  filterMiddleware<RegsiterReqBody>(['confirm_password', 'date_of_birth', 'email', 'name', 'password']),
+  filterMiddleware<RegisterReqBody>(['confirm_password', 'date_of_birth', 'email', 'name', 'password']),
   wrapperRequestHandler(registerController)
 )
 
