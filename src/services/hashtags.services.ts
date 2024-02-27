@@ -27,7 +27,7 @@ class HashtagServices {
       })
     )
 
-    return hashtagsDocuments.map((hashtag) => (hashtag as WithId<Tweet>)._id)
+    return hashtagsDocuments.map((hashtag) => (hashtag as WithId<Hashtag>)._id)
   }
 }
 
