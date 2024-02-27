@@ -11,6 +11,9 @@ import tweetsRouter from './routes/tweets.routes'
 import bookmarksRouter from './routes/bookmarks.routes'
 import likesRouter from './routes/likes.routes'
 
+//import fake data
+// import './utils/fake'
+
 const app = express()
 const port = process.env.PORT || '4000'
 
