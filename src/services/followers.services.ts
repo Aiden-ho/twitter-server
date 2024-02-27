@@ -3,6 +3,21 @@ import databaseServices from './database.services'
 import Follower from '~/models/schemas/Follower.schema'
 
 class FollowerServices {
+  async getFollowers(user_id: string) {
+    const result = await databaseServices.followers
+      .find(
+        { user_id: new ObjectId(user_id) },
+        {
+          projection: {
+            followed_user_id: 1,
+            _id: 0
+          }
+        }
+      )
+      .toArray()
+    const followers = result.map((item) => item.followed_user_id)
+    return followers
+  }
   async checkFollowed(user_id: string, followed_user_id: string) {
     const result = await databaseServices.followers.findOne({
       user_id: new ObjectId(user_id),

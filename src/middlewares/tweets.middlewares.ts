@@ -10,7 +10,6 @@ import HTTP_STATUS from '~/constants/httpStatus'
 import tweetServices from '~/services/tweets.services'
 import { NextFunction, Request, Response } from 'express'
 import Tweet from '~/models/schemas/Tweet.schema'
-import userServices from '~/services/users.services'
 import { wrapperRequestHandler } from '~/utils/handlers'
 import databaseServices from '~/services/database.services'
 
@@ -39,7 +38,7 @@ export const tweetValidator = validationRunner(
             const type = req.body.type as TweetType
             //Nếu `type` là retweet, comment, quotetweet thì `parent_id` phải là `tweet_id` của tweet cha
             if (
-              ![TweetType.Retweet, TweetType.Comment, TweetType.QuoteTweet].includes(type) &&
+              [TweetType.Retweet, TweetType.Comment, TweetType.QuoteTweet].includes(type) &&
               !ObjectId.isValid(value)
             ) {
               throw Error(TWEET_MESSAGES.PARENT_ID_MUST_BE_A_VALID_TWEET_ID)
@@ -189,3 +188,71 @@ export const tweetAudienceValidator = wrapperRequestHandler(async (req: Request,
 
   next()
 })
+
+export const tweetChildrenValidator = validationRunner(
+  checkSchema(
+    {
+      tweet_type: {
+        isNumeric: {
+          errorMessage: TWEET_MESSAGES.TWEET_TYPE_MUST_BE_A_NUMBER
+        },
+        isIn: {
+          options: [arrayTweetType],
+          errorMessage: TWEET_MESSAGES.TWEET_TYPE_INVALID
+        },
+        custom: {
+          options: (value, { req }) => {
+            const num = Number(value)
+
+            if (num === 0) {
+              throw new Error(TWEET_MESSAGES.TWEET_TYPE_MUST_BE_DIFFERENT_FROM_TWEET)
+            }
+
+            return true
+          }
+        }
+      }
+    },
+    ['query']
+  )
+)
+
+export const paginationValidator = validationRunner(
+  checkSchema(
+    {
+      limit: {
+        isNumeric: {
+          errorMessage: TWEET_MESSAGES.LIMIT_MUST_BE_A_NUMBER
+        },
+        custom: {
+          options: (value, { req }) => {
+            const num = Number(value)
+
+            if (num > Number(process.env.MAXIMUM_LIMIT_TWEET) || num < Number(process.env.MINIMUM_LIMIT_TWEET)) {
+              throw new Error(TWEET_MESSAGES.LIMIT_VALUE_MUST_BE_FROM_1_TO_100)
+            }
+
+            return true
+          }
+        }
+      },
+      page: {
+        isNumeric: {
+          errorMessage: TWEET_MESSAGES.PAGE_MUST_BE_A_NUMBER
+        },
+        custom: {
+          options: (value, { req }) => {
+            const num = Number(value)
+
+            if (num < 1) {
+              throw new Error(TWEET_MESSAGES.PAGE_VALUE_MUST_BE_AT_LEAST_1)
+            }
+
+            return true
+          }
+        }
+      }
+    },
+    ['query']
+  )
+)

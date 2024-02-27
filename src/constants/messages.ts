@@ -84,7 +84,14 @@ export const TWEET_MESSAGES = {
   TWEET_ID_IS_INVALID: 'tweet id is invalid',
   TWEET_NOT_FOUND: 'tweet not found',
   GET_TWEET_SUCCESSFUL: 'Get tweet successful',
-  TWEET_IS_NOT_PUBLIC: 'Tweet is not public'
+  TWEET_IS_NOT_PUBLIC: 'Tweet is not public',
+  LIMIT_MUST_BE_A_NUMBER: 'Limit must be a number',
+  LIMIT_VALUE_MUST_BE_FROM_1_TO_100: 'Limit value must be from 1 to 100',
+  PAGE_MUST_BE_A_NUMBER: 'Page must be a number',
+  PAGE_VALUE_MUST_BE_AT_LEAST_1: 'Page must be at least 1',
+  TWEET_TYPE_MUST_BE_A_NUMBER: 'Tweet type must be a number',
+  TWEET_TYPE_MUST_BE_DIFFERENT_FROM_TWEET: 'Tweet type must be different from tweet',
+  GET_NEW_FEEDS_SUCCUSSFUK: 'Get new feeds successful'
 }
 
 export const BOOKMARK_MESSAGES = {
