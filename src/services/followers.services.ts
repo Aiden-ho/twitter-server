@@ -3,7 +3,7 @@ import databaseServices from './database.services'
 import Follower from '~/models/schemas/Follower.schema'
 
 class FollowerServices {
-  async getFollowers(user_id: string) {
+  async getFollowedUsers(user_id: string) {
     const result = await databaseServices.followers
       .find(
         { user_id: new ObjectId(user_id) },

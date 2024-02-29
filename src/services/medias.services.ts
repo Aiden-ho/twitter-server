@@ -124,7 +124,7 @@ class MediasServices {
           url: isProduction
             ? `${process.env.HOST}/static/video/${newName}/master.m3u8`
             : `http://localhost:${process.env.PORT}/static/video-hls/${newName}/master.m3u8`,
-          type: MediaType.Video
+          type: MediaType.HLS
         }
       })
     )

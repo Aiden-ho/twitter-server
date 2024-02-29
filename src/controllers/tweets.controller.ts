@@ -84,7 +84,7 @@ export const getNewFeedsController = async (
   const limit = Number(req.query.limit)
   const page = Number(req.query.page)
 
-  const follower_user_ids = await followerServices.getFollowers(user_id)
+  const follower_user_ids = await followerServices.getFollowedUsers(user_id)
 
   follower_user_ids.push(new ObjectId(user_id))
 
@@ -98,7 +98,7 @@ export const getNewFeedsController = async (
     item.user_views += 1
   })
   res.json({
-    message: TWEET_MESSAGES.GET_NEW_FEEDS_SUCCUSSFUK,
+    message: TWEET_MESSAGES.GET_NEW_FEEDS_SUCCUSSFUL,
     result: {
       tweets,
       limit,
