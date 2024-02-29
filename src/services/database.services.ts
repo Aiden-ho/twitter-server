@@ -58,9 +58,23 @@ class DatabaseServices {
   }
 
   async indexFollowers() {
-    const exist = await this.videosStatus.indexExists(['user_id_1_followed_user_id_1'])
+    const exist = await this.followers.indexExists(['user_id_1_followed_user_id_1'])
     if (!exist) {
       this.followers.createIndex({ user_id: 1, followed_user_id: 1 })
+    }
+  }
+
+  async indexTweets() {
+    const exist = await this.tweets.indexExists(['content_text'])
+    if (!exist) {
+      this.tweets.createIndex({ content: 'text' }, { default_language: 'none' })
+    }
+  }
+
+  async indexHashTags() {
+    const exist = await this.hashtags.indexExists(['name_text'])
+    if (!exist) {
+      this.hashtags.createIndex({ name: 'text' })
     }
   }
 

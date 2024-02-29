@@ -13,7 +13,18 @@ export enum TokenType {
 
 export enum MediaType {
   Image,
-  Video
+  Video,
+  HLS
+}
+
+export enum MediaTypeQuery {
+  Image = 'image',
+  Video = 'video'
+}
+
+export enum PeopleFollowedQuery {
+  Anyone = '0',
+  Followed = '1'
 }
 
 export enum VideoEncodingStatus {

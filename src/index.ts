@@ -10,6 +10,7 @@ import staticRouter from './routes/statics.routes'
 import tweetsRouter from './routes/tweets.routes'
 import bookmarksRouter from './routes/bookmarks.routes'
 import likesRouter from './routes/likes.routes'
+import searchRouter from './routes/search.routes'
 
 //import fake data
 // import './utils/fake'
@@ -27,6 +28,8 @@ databaseServices.connect().then(() => {
   databaseServices.indexRefreshToken()
   databaseServices.indexVideosStatus()
   databaseServices.indexFollowers()
+  databaseServices.indexTweets()
+  databaseServices.indexHashTags()
 })
 
 //CORS
@@ -46,6 +49,9 @@ app.use('/static', staticRouter)
 
 // handle routing tweet
 app.use('/tweets', tweetsRouter)
+
+// handle routing search
+app.use('/search', searchRouter)
 
 // handle routing bookmark tweet
 app.use('/bookmarks', bookmarksRouter)

@@ -91,7 +91,12 @@ export const TWEET_MESSAGES = {
   PAGE_VALUE_MUST_BE_AT_LEAST_1: 'Page must be at least 1',
   TWEET_TYPE_MUST_BE_A_NUMBER: 'Tweet type must be a number',
   TWEET_TYPE_MUST_BE_DIFFERENT_FROM_TWEET: 'Tweet type must be different from tweet',
-  GET_NEW_FEEDS_SUCCUSSFUK: 'Get new feeds successful'
+  GET_NEW_FEEDS_SUCCUSSFUL: 'Get new feeds successful',
+  SEARCH_SUCCUSSFUL: 'Search successful',
+  CONTENT_MUST_BE_A_STRING: 'Content must be string',
+  HASHTAG_MUST_BE_A_STRING: 'Hashtag must be string',
+  MEDIA_TYPE_MUST_BE_IMAGE_OR_VIDEO: 'Media type mus be in [image, video]',
+  PEOPLE_FOLLOWED_MUST_BE_0_OR_1: 'People followed type mus be in [0, 1]'
 }
 
 export const BOOKMARK_MESSAGES = {
