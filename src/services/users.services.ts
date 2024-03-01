@@ -9,6 +9,7 @@ import { TokenType, UserVerifyStatus } from '~/constants/enum'
 import refreshTokensServices from './refreshTokens.services'
 import { ObjectId } from 'mongodb'
 import { USER_MESSAGES } from '~/constants/messages'
+import { sendEmailForgotPassword, sendVerifyEmailRegister } from '~/utils/send-email'
 
 class UserServices {
   private signAccessToken({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
@@ -120,7 +121,9 @@ class UserServices {
     })
 
     refreshTokensServices.save(user_id.toString(), refresh_token as string)
-    console.log('email_verify_token', email_verify_token)
+
+    //send email
+    await sendVerifyEmailRegister({ email: payload.email, email_verify_token: email_verify_token })
 
     return {
       access_token,
@@ -209,11 +212,11 @@ class UserServices {
     }
   }
 
-  async resendVerifyEmail(user_id: string) {
+  async resendVerifyEmail(user_id: string, email: string) {
     const email_verify_token = await this.signEmailVerifyToken({ user_id, verify: UserVerifyStatus.Unverified })
 
-    //Giả lập gửi email
-    console.log('email_verify_token', email_verify_token)
+    //send email
+    await sendVerifyEmailRegister({ email, email_verify_token })
 
     //update lại token mới
     databaseServices.users.updateOne(
@@ -231,7 +234,7 @@ class UserServices {
     }
   }
 
-  async forgotPassword({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
+  async forgotPassword({ user_id, verify, email }: { user_id: string; verify: UserVerifyStatus; email: string }) {
     const forgot_password_token = await this.signforgotPasswordToken({ user_id, verify })
 
     //update lại token mới
@@ -245,8 +248,8 @@ class UserServices {
       }
     )
 
-    //Giả lập gửi email lấy lại mật khẩu (/forgot-password?token=forgot_password_token)
-    console.log('forgot_password_token', forgot_password_token)
+    //send email
+    await sendEmailForgotPassword({ email, forgot_password_token })
 
     return {
       message: USER_MESSAGES.CHECK_EMAIL_TO_RESET_PASSWORD

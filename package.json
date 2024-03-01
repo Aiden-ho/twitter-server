@@ -38,6 +38,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@aws-sdk/client-ses": "^3.523.0",
     "@vidstack/react": "^1.10.9",
     "axios": "^1.6.7",
     "cors": "^2.8.5",

@@ -120,7 +120,7 @@ export const refreshTokenController = async (
 export const verifyEmailController = async (req: Request<ParamsDictionary, any, VerifyEmailReqBody>, res: Response) => {
   const { user_id } = req.decoded_email_verify_token as PayloadToken
 
-  const user = await userServices.getUser({ _id: user_id })
+  const user = await userServices.getFullUser(user_id)
 
   if (!user) {
     return res.status(HTTP_STATUS.NOT_FOUND).json({
@@ -130,7 +130,7 @@ export const verifyEmailController = async (req: Request<ParamsDictionary, any, 
 
   if (user.email_verify_token === '') {
     return res.json({
-      message: USER_MESSAGES.EMAIL_VERIFY_SUCCESSFUL
+      message: USER_MESSAGES.EMAIL_ALREADY_VERIFIED_BEFORE
     })
   }
 
@@ -162,7 +162,7 @@ export const resendVerifyEmailController = async (
     })
   }
 
-  const result = await userServices.resendVerifyEmail(user_id)
+  const result = await userServices.resendVerifyEmail(user_id, user.email)
 
   return res.json(result)
 }
@@ -173,7 +173,11 @@ export const forgotPasswordController = async (
 ) => {
   const user = req.user as User
   const user_id = user._id as ObjectId
-  const result = await userServices.forgotPassword({ user_id: user_id.toString(), verify: user.verify })
+  const result = await userServices.forgotPassword({
+    user_id: user_id.toString(),
+    verify: user.verify,
+    email: user.email
+  })
 
   return res.json(result)
 }
