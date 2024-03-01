@@ -137,7 +137,7 @@ usersRouter.post('/resend-verify-email', accessTokenValidator, wrapperRequestHan
  *
  * Path: /forgot-password
  * Method: POST
- * header: bearer access_token
+ * body: email
  **/
 usersRouter.post('/forgot-password', forgotPasswordValidator, wrapperRequestHandler(forgotPasswordController))
 
