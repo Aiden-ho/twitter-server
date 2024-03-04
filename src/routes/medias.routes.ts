@@ -64,7 +64,7 @@ mediasRouter.post(
  *
  **/
 mediasRouter.get(
-  '/video-status/:id',
+  '/video-status/:idName',
   accessTokenValidator,
   verifyUserValidator,
   wrapperRequestHandler(getVideoStatusController)
