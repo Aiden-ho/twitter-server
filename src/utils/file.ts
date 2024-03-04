@@ -37,11 +37,11 @@ export const uploadImages = (req: Request) => {
   return new Promise<File[]>((resolve, reject) => {
     form.parse(req, (err, fields, files) => {
       if (err) {
-        reject(err)
+        return reject(err)
       }
       // eslint-disable-next-line no-extra-boolean-cast
       if (!Boolean(files.image)) {
-        reject(new Error(USER_MESSAGES.FILE_IS_EMPTY))
+        return reject(new Error(USER_MESSAGES.FILE_IS_EMPTY))
       }
 
       resolve(files.image as File[])
@@ -74,12 +74,12 @@ export const uploadVideos = async (req: Request) => {
   return new Promise<File[]>((resolve, reject) => {
     form.parse(req, (err, fields, files) => {
       if (err) {
-        reject(err)
+        return reject(err)
       }
 
       // eslint-disable-next-line no-extra-boolean-cast
       if (!Boolean(files.video)) {
-        reject(new Error(USER_MESSAGES.FILE_IS_EMPTY))
+        return reject(new Error(USER_MESSAGES.FILE_IS_EMPTY))
       }
 
       const videos = files.video as File[]
@@ -103,4 +103,22 @@ export const getNameFormFileName = (fullname: string) => {
 export const getExtensionFormFileName = (fullname: string) => {
   const name_arr = fullname.split('.')
   return name_arr.pop()
+}
+
+export const getFilesInDir = (dir: string, files: string[] = []) => {
+  // Get an array of all files and directories in the passed directory using fs.readdirSync
+  const fileList = fs.readdirSync(dir)
+  // Create the full path of the file/directory by concatenating the passed directory and file/directory name
+  for (const file of fileList) {
+    const name = `${dir}/${file}`
+    // Check if the current file/directory is a directory using fs.statSync
+    if (fs.statSync(name).isDirectory()) {
+      // If it is a directory, recursively call the getFiles function with the directory path and the files array
+      getFilesInDir(name, files)
+    } else {
+      // If it is a file, push the full path to the files array
+      files.push(name)
+    }
+  }
+  return files
 }
