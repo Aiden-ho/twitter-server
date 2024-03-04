@@ -149,7 +149,7 @@ const encodeMax720 = async ({
     slash(outputPath)
   )
 
-  await $`ffmpeg ${args}`
+  await $`ffmpeg -hide_banner -loglevel error ${args}`
   return true
 }
 
@@ -206,7 +206,7 @@ const encodeMax1080 = async ({
     slash(outputPath)
   )
 
-  await $`ffmpeg ${args}`
+  await $`ffmpeg -hide_banner -loglevel error ${args}`
   return true
 }
 
@@ -269,7 +269,7 @@ const encodeMax1440 = async ({
     slash(outputPath)
   )
 
-  await $`ffmpeg ${args}`
+  await $`ffmpeg -hide_banner -loglevel error ${args}`
   return true
 }
 
@@ -332,7 +332,7 @@ const encodeMaxOriginal = async ({
     slash(outputPath)
   )
 
-  await $`ffmpeg ${args}`
+  await $`ffmpeg -hide_banner -loglevel error ${args}`
   return true
 }
 
