@@ -158,7 +158,7 @@ const imageSchema: ParamSchema = {
   }
 }
 
-const idFollowerSchema: ParamSchema = {
+const idUserSchema: ParamSchema = {
   trim: true,
   custom: {
     options: async (value, { req }) => {
@@ -528,7 +528,7 @@ export const updateMeValidator = validationRunner(
 export const followerValidator = validationRunner(
   checkSchema(
     {
-      followed_user_id: idFollowerSchema
+      followed_user_id: idUserSchema
     },
     ['body']
   )
@@ -537,7 +537,7 @@ export const followerValidator = validationRunner(
 export const unfollowerValidator = validationRunner(
   checkSchema(
     {
-      user_id: idFollowerSchema
+      user_id: idUserSchema
     },
     ['params']
   )
@@ -578,6 +578,15 @@ export const changePasswordValidator = validationRunner(
       confirm_new_password: getConfirmPasswordSchema('new_password')
     },
     ['body']
+  )
+)
+
+export const receiverIdValidator = validationRunner(
+  checkSchema(
+    {
+      receiver_id: idUserSchema
+    },
+    ['params']
   )
 )
 
