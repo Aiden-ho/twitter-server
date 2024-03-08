@@ -10,6 +10,7 @@ import { ErrorWithStatus } from '~/models/Errors'
 import { PayloadToken } from '~/models/requests/User.request'
 import refreshTokensServices from '~/services/refreshTokens.services'
 import userServices from '~/services/users.services'
+import { verifyAccessToken } from '~/utils/common'
 import { hashPassword } from '~/utils/crypto'
 import { verifyToken } from '~/utils/jwt'
 import validationRunner from '~/utils/validation-runner'
@@ -249,33 +250,7 @@ export const accessTokenValidator = validationRunner(
         trim: true,
         custom: {
           options: async (value: string, { req }) => {
-            try {
-              //check empty access token with custom error
-              if (!value) {
-                throw new ErrorWithStatus({
-                  message: USER_MESSAGES.ACCESS_TOKEN_IS_REQUIRED,
-                  status: HTTP_STATUS.UNAUTHORIZED
-                })
-              }
-              //verify access token
-              const access_token = value.replace('Bearer ', '')
-              const decoded_authorization = await verifyToken({
-                token: access_token,
-                secretKey: process.env.JWT_SERCRET_ACCESS_TOKEN as string
-              })
-              //add decode token to req
-              ;(req as Request).decoded_authorization = decoded_authorization
-              return true
-            } catch (error) {
-              if (error instanceof JsonWebTokenError) {
-                throw new ErrorWithStatus({
-                  message: USER_MESSAGES.ACCESS_TOKEN_IS_INVALID,
-                  status: HTTP_STATUS.UNAUTHORIZED
-                })
-              }
-
-              throw error
-            }
+            return await verifyAccessToken(value, req as Request)
           }
         }
       }
