@@ -30,6 +30,7 @@ class ConversationServices {
     }
     const conversations = await databaseServices.conversations
       .find(match)
+      .sort({ created_at: -1 })
       .skip((page - 1) * limit)
       .limit(limit)
       .toArray()
