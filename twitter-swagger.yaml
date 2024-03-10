@@ -1,0 +1,1209 @@
+openapi: 3.0.3
+info:
+  title: Twitter Clone - OpenAPI 3.0
+  description: |-
+    This is a sample Pet Store Server based on the OpenAPI 3.0 specification.  You can find out more about
+    Swagger at [https://swagger.io](https://swagger.io). In the third iteration of the pet store, we've switched to the design first approach!
+    You can now help us improve the API whether it's by making changes to the definition itself or to the code.
+    That way, with time, we can improve the API in general, and expose some of the new features in OAS3.
+
+    _If you're looking for the Swagger 2.0/OAS 2.0 version of Petstore, then click [here](https://editor.swagger.io/?url=https://petstore.swagger.io/v2/swagger.yaml). Alternatively, you can load via the `Edit > Load Petstore OAS 2.0` menu option!_
+
+    Some useful links:
+    - [The Pet Store repository](https://github.com/swagger-api/swagger-petstore)
+    - [The source API definition for the Pet Store](https://github.com/swagger-api/swagger-petstore/blob/master/src/main/resources/openapi.yaml)
+  contact:
+    email: aiden.hokiet@gmail.com
+  version: 1.0.0
+servers:
+  - url: http://localhost:4000/
+tags:
+  - name: users
+    description: Operations about user
+  - name: medias
+    description: Operations about media
+  - name: static
+    description: Operations about serving media
+  - name: tweet
+    description: Operations about tweet
+paths:
+  /users/register:
+    post:
+      tags:
+        - users
+      summary: Register
+      description: Create new account
+      operationId: register
+      requestBody:
+        description: New user information
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterBody'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Register successful
+                  result:
+                    $ref: '#/components/schemas/SuccessAuthentication'
+        '422':
+          description: Invalid input
+  /users/login:
+    post:
+      tags:
+        - users
+      summary: Login
+      description: Login to an existing account
+      operationId: login
+      requestBody:
+        description: account information
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginBody'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Login successful
+                  result:
+                    $ref: '#/components/schemas/SuccessAuthentication'
+        '422':
+          description: Invalid input
+        '404':
+          description: User not found
+  /users/logout:
+    post:
+      tags:
+        - users
+      summary: Logout
+      description: logout of the account.
+      operationId: logout
+      requestBody:
+        description: refresh token
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refresh_token:
+                  type: string
+                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjVlNjAwMThhYWI4YmQ1MjA0MjYzMTc2IiwidG9rZW5fdHlwZSI6MCwidmVyaWZ5IjoxLCJpYXQiOjE3MDk5Nzc4NTcsImV4cCI6MTcxODYxNzg1N30.TaWhMKyOiKEOOk-KCB251LludRaXMF8g-IqHqECc7rA
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Logout successful
+        '401':
+          description: Unauthorized
+      security:
+        - BearerAuth: []
+  /users/me:
+    get:
+      tags:
+        - users
+      summary: get me profile
+      description: get profile of logged in account
+      operationId: getMe
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Login successful
+                  result:
+                    $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+        '401':
+          description: Unauthorized
+      security:
+        - BearerAuth: []
+    patch:
+      tags:
+        - users
+      summary: Update me profile
+      description: update profile of logged in account
+      operationId: updateProfile
+      requestBody:
+        description: profile information
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Update profile successful
+                  result:
+                    $ref: '#/components/schemas/User'
+        '422':
+          description: Invalid input
+        '403':
+          description: User not verified
+        '401':
+          description: Unauthorized
+      security:
+        - BearerAuth: []
+  /users/{username}:
+    get:
+      tags:
+        - users
+      summary: get user profile
+      description: get profile of an existing account
+      operationId: getUserProfile
+      parameters:
+        - name: username
+          in: path
+          description: username of account
+          required: true
+          schema:
+            type: string
+            example: user_01
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Get profile successful
+                  result:
+                    $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+        '401':
+          description: Unauthorized
+  /users/follow:
+    post:
+      tags:
+        - users
+      summary: follow account
+      description: follow an existing account
+      operationId: folowAccount
+      requestBody:
+        description: profile information
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: hotuankietps02152+09@gmail.com
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Follow successful
+        '404':
+          description: User not found
+        '401':
+          description: Unauthorized
+        '403':
+          description: User not verified
+      security:
+        - BearerAuth: []
+  /users/unfollow/{user_id}:
+    delete:
+      tags:
+        - users
+      summary: follow account
+      description: follow an existing account
+      operationId: folowAccount
+      parameters:
+        - name: user_id
+          in: path
+          description: id of account
+          required: true
+          schema:
+            type: string
+            format: mongoId
+            example: 65b66e388440a3b439937625
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Follow successful
+        '404':
+          description: User not found
+        '401':
+          description: Unauthorized
+        '403':
+          description: User not verified
+      security:
+        - BearerAuth: []
+  /users/verify-email:
+    post:
+      tags:
+        - users
+      summary: Verify email
+      description: Verify email of new account.
+      operationId: verifyEmail
+      requestBody:
+        description: Email verify token
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email_verify_token:
+                  type: string
+                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjVlNjAwMThhYWI4YmQ1MjA0MjYzMTc2IiwidG9rZW5fdHlwZSI6MCwidmVyaWZ5IjoxLCJpYXQiOjE3MDk5Nzc4NTcsImV4cCI6MTcxODYxNzg1N30.TaWhMKyOiKEOOk-KCB251LludRaXMF8g-IqHqECc9c1
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Email verify successful
+                  result:
+                    $ref: '#/components/schemas/SuccessAuthentication'
+
+        '401':
+          description: Unauthorized
+      security:
+        - BearerAuth: []
+  /users/resend-verify-email:
+    post:
+      tags:
+        - users
+      summary: Resend verify email
+      description: Resend email for verify new account.
+      operationId: resendVerifyEmail
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Resend email verify successful
+        '401':
+          description: Unauthorized
+      security:
+        - BearerAuth: []
+  /users/change-password:
+    put:
+      tags:
+        - users
+      summary: Change password
+      description: Change password of an existing account
+      operationId: changePassowrd
+      requestBody:
+        description: new password information
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordBody'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Change password successful
+
+        '401':
+          description: Unauthorized
+        '403':
+          description: User not verified
+      security:
+        - BearerAuth: []
+  /users/forgot-password:
+    post:
+      tags:
+        - users
+      summary: Forgot password
+      description: request reset password of an existing account
+      operationId: forgotPassword
+      requestBody:
+        description: email of an existing account
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: hotuankietps02152+07@gmail.com
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Check email to reset password
+        '404':
+          description: User not found
+        '401':
+          description: Unauthorized
+      security:
+        - BearerAuth: []
+  /users/verify-forgot-password:
+    post:
+      tags:
+        - users
+      summary: Verify forgot password token
+      description: request verify forgot password token in email reset password
+      operationId: verifyForgotPassword
+      requestBody:
+        description: Forgot password token
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                forgot_password_token:
+                  type: string
+                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjViZjU3NzM3ZTY5MDJjMDk0NjVhNTc0IiwidG9rZW5fdHlwZSI6MiwiaWF0IjoxNzA3MDM4NTkzLCJleHAiOjE3MDcyOTc3OTN9.Ca52fwkoBTJZHEpc8RLnHJYJaLMqXTKq6yywzZJxAtI
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Forgot password verify successful
+        '404':
+          description: User not found
+        '401':
+          description: Unauthorized
+      security:
+        - BearerAuth: []
+  /users/reset-password:
+    post:
+      tags:
+        - users
+      summary: reset password
+      description: reset password of an existing account
+      operationId: resetPassword
+      requestBody:
+        description: Forgot password token
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordBody'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Reset password successful
+        '404':
+          description: User not found
+        '401':
+          description: Unauthorized
+        '422':
+          description: Invalid input
+      security:
+        - BearerAuth: []
+  /medias/upload-images:
+    post:
+      tags:
+        - medias
+      summary: Upload images
+      description: Upload image of tweet
+      operationId: uploadImages
+      requestBody:
+        description: Image file
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UploadImages'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Upload images successful
+                  result:
+                    $ref: '#/components/schemas/SuccessImagesUpload'
+        '422':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+        '403':
+          description: User not verified
+      security:
+        - BearerAuth: []
+  /medias/upload-video:
+    post:
+      tags:
+        - medias
+      summary: Upload video
+      description: Upload video of tweet
+      operationId: uploadVideo
+      requestBody:
+        description: video file
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UploadVideo'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Upload video successful
+                  result:
+                    $ref: '#/components/schemas/SuccessVideoUpload'
+        '422':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+        '403':
+          description: User not verified
+      security:
+        - BearerAuth: []
+  /medias/upload-video-hls:
+    post:
+      tags:
+        - medias
+      summary: Upload video HLS
+      description: Upload video of tweet with HLS
+      operationId: uploadVideoHLS
+      requestBody:
+        description: video file
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UploadVideo'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Upload video successful
+                  result:
+                    $ref: '#/components/schemas/SuccessVideoHLSUpload'
+        '422':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+        '403':
+          description: User not verified
+      security:
+        - BearerAuth: []
+  /medias/video-status/{video_name}:
+    get:
+      tags:
+        - medias
+      summary: check upload status of HLS video
+      description: check upload status of HLS video
+      operationId: videoStatus
+      parameters:
+        - name: video_name
+          in: path
+          description: name of video HLS
+          required: true
+          schema:
+            type: string
+            example: rim2RZSFmRITdJm0sbLh5
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Get Video Status successful
+                  result:
+                    $ref: '#/components/schemas/VideoStatus'
+        '422':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+        '403':
+          description: User not verified
+      security:
+        - BearerAuth: []
+  /static/image/{filename}:
+    get:
+      tags:
+        - static
+      summary: get image
+      description: get image uploaded
+      operationId: getImage
+      parameters:
+        - name: filename
+          in: path
+          description: name of image
+          required: true
+          schema:
+            type: string
+            example: 23550858740a56d55c988b301.jpg
+      responses:
+        '200':
+          description: Successful operation
+        '404':
+          description: Not found
+  /static/video-streaming/:filename:
+    get:
+      tags:
+        - static
+      summary: get video
+      description: get video uploaded
+      operationId: getVideo
+      parameters:
+        - name: filename
+          in: path
+          description: name of video
+          required: true
+          schema:
+            type: string
+            example: d0Kg1-_j2xeUwCZmG8niT.mp4
+      responses:
+        '200':
+          description: Successful operation
+        '404':
+          description: Not found
+  /static/video-hls/{filename}/master.m3u8:
+    get:
+      tags:
+        - static
+      summary: get video hls
+      description: get video hls uploaded (open with hls player)
+      operationId: getVideoHLS
+      parameters:
+        - name: filename
+          in: path
+          description: name of video HLS
+          required: true
+          schema:
+            type: string
+            example: rim2RZSFmRITdJm0sbLh5
+      responses:
+        '200':
+          description: Successful operation
+        '404':
+          description: Not found
+  /tweets:
+    post:
+      tags:
+        - tweet
+      summary: Create tweet
+      description: Create new tweet
+      operationId: createTweet
+      requestBody:
+        description: Tweet information
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TweetBody'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Create tweet succesful
+                  result:
+                    $ref: '#/components/schemas/Tweet'
+        '404':
+          description: User not found
+        '401':
+          description: Unauthorized
+        '422':
+          description: Invalid input
+      security:
+        - BearerAuth: []
+  /tweets/{tweet_id}/details:
+    get:
+      tags:
+        - tweet
+      summary: get an existing tweet detail
+      description: get an existing tweet detail
+      operationId: getTweet
+      parameters:
+        - name: tweet_id
+          in: path
+          description: id of tweet
+          required: true
+          schema:
+            type: string
+            example: 65ed8e5883f711deebd9a3db
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Get tweet successful
+                  result:
+                    $ref: '#/components/schemas/Tweet'
+        '400':
+          description: tweet id is invalid
+        '404':
+          description: tweet not found
+        '401':
+          description: Unauthorized (private tweet need access_token)
+        '403':
+          description: User not verified (if new account logged in, user need to verify frist)
+        '422':
+          description: Invalid input
+  /tweets/{tweet_id}/children?page={page}&limit={limit}&tweet_type={tweet_type}:
+    get:
+      tags:
+        - tweet
+      summary: get tweet children
+      description: get children of an existing tweet
+      operationId: getTweetChildren
+      parameters:
+        - name: tweet_id
+          in: path
+          description: id of tweet
+          required: true
+          schema:
+            type: string
+            example: 65ed8e5883f711deebd9a3db
+        - name: page
+          in: query
+          description: page of pagination
+          required: true
+          schema:
+            type: string
+            example: 1
+        - name: limit
+          in: query
+          description: limit of list pagination
+          required: true
+          schema:
+            type: string
+            example: 5
+        - name: tweet_type
+          in: query
+          description: Type of tweet (TweetType enum)
+          required: true
+          schema:
+            type: number
+            example: 1
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Get tweet successful
+                  result:
+                    $ref: '#/components/schemas/Tweets'
+        '400':
+          description: tweet id is invalid
+        '404':
+          description: tweet not found
+        '401':
+          description: Unauthorized (private tweet need access_token)
+        '403':
+          description: User not verified (if new account logged in, user need to verify frist)
+        '422':
+          description: Invalid input
+  /tweets/new-feeds?page={page}&limit={limit}:
+    get:
+      tags:
+        - tweet
+      summary: get new feed
+      description: get new feed after logged in
+      operationId: getNewFeed
+      parameters:
+        - name: page
+          in: query
+          description: page of pagination
+          required: true
+          schema:
+            type: string
+            example: 1
+        - name: limit
+          in: query
+          description: limit of list pagination
+          required: true
+          schema:
+            type: string
+            example: 5
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Get new feeds successful
+                  result:
+                    $ref: '#/components/schemas/Tweets'
+        '401':
+          description: Unauthorized
+        '403':
+          description: User not verified
+        '422':
+          description: Invalid input
+      security:
+        - BearerAuth: []
+components:
+  schemas:
+    RegisterBody:
+      type: object
+      properties:
+        email:
+          type: integer
+          format: int64
+          example: hotuankietps02152@gmail.com
+        password:
+          type: string
+          example: 123a123@
+        confirm_password:
+          type: string
+          example: 123a123@
+        name:
+          type: string
+          example: Kiet
+        date_of_birth:
+          type: string
+          example: '2024-01-27T08:33:46.050Z'
+    LoginBody:
+      type: object
+      properties:
+        email:
+          type: string
+          example: hotuankietps02152+09@gmail.com
+        password:
+          type: string
+          example: Password_1
+    SuccessAuthentication:
+      type: object
+      properties:
+        access_token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjVlNjAwMThhYWI4YmQ1MjA0MjYzMTc2IiwidG9rZW5fdHlwZSI6MCwidmVyaWZ5IjoxLCJpYXQiOjE3MDk5Nzc4NTcsImV4cCI6MTcxMDIzNzA1N30.hTaqM4vTAUPLqeNDQ_L-GhXovomzLBT5xl2nqgx-BFE
+        refresh_token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjVlNjAwMThhYWI4YmQ1MjA0MjYzMTc2IiwidG9rZW5fdHlwZSI6MCwidmVyaWZ5IjoxLCJpYXQiOjE3MDk5Nzc4NTcsImV4cCI6MTcxODYxNzg1N30.TaWhMKyOiKEOOk-KCB251LludRaXMF8g-IqHqECc7rA
+    ChangePasswordBody:
+      type: object
+      properties:
+        old_password:
+          type: string
+          example: Password_1
+        new_password:
+          type: string
+          example: Password_2
+        confirm_new_password:
+          type: string
+          example: Password_2
+    ResetPasswordBody:
+      type: object
+      properties:
+        forgot_password_token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjViZjU3NzM3ZTY5MDJjMDk0NjVhNTc0IiwidG9rZW5fdHlwZSI6MiwiaWF0IjoxNzA3MDM4NTkzLCJleHAiOjE3MDcyOTc3OTN9.Ca52fwkoBTJZHEpc8RLnHJYJaLMqXTKq6yywzZJxAtI,
+        password:
+          type: string
+          example: Password_2
+        confirm_password:
+          type: string
+          example: Password_2
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 65e60018aab8bd5204263176
+        name:
+          type: string
+          example: Kiet
+        email:
+          type: string
+          example: hotuankietps02152+09@gmail.com
+        date_of_birth:
+          type: string
+          format: ISO8601
+          example: 2024-01-27T08:33:46.050Z
+        created_at:
+          type: string
+          format: ISO8601
+          example: 2024-03-04T17:08:40.624Z
+        updated_at:
+          type: string
+          format: ISO8601
+          example: 2024-03-04T17:09:10.484Z
+        verify:
+          $ref: '#/components/schemas/UserVerifyStatus'
+        twitter_circle:
+          type: array
+          items:
+            type: string
+            format: mongoId
+          example: [65e60018aab8bd5204263190, 65e60018aab8bd5204263142]
+        bio:
+          type: string
+          example: 'Hello world'
+        location:
+          type: string
+          example: 'Vietnam'
+        website:
+          type: string
+          example: 'www.example.com'
+        username:
+          type: string
+          example: user_65e60018aab
+        avatar:
+          type: string
+          example: https:twitter-clone.com/images/avatar.jpg
+        cover_photo:
+          type: string
+          example: 'https:twitter-clone.com/images/cover_photo.jpg'
+    UserVerifyStatus:
+      type: number
+      enum: [Unverified, Verified, Banned]
+      example: 1
+    MediaType:
+      type: number
+      enum: [Image, Video, HLS]
+      example: 0
+    VideoEncodingStatus:
+      type: number
+      enum: [Pending, Processing, Succeed, Failed]
+      example: 0
+    TweetType:
+      type: number
+      enum: [Tweet, Retweet, Comment, QuoteTweet]
+      example: 1
+    TweetAudience:
+      type: number
+      enum: [Everyone, TwitterCircle]
+      example: 0
+    Media:
+      type: object
+      properties:
+        url:
+          type: string
+        type:
+          $ref: '#/components/schemas/MediaType'
+      example:
+        url: http://localhost:4000/static/image/23550858740a56d55c988b301.jpg
+        type: 0
+    UploadImages:
+      type: object
+      properties:
+        image:
+          type: array
+          maxLength: 4
+          items:
+            type: string
+            format: binary
+    UploadVideo:
+      type: object
+      properties:
+        video:
+          type: array
+          maxLength: 4
+          items:
+            type: string
+            format: binary
+    SuccessImagesUpload:
+      type: array
+      items:
+        type: object
+        properties:
+          url:
+            type: string
+          type:
+            $ref: '#/components/schemas/MediaType'
+        example:
+          items:
+            url: http://localhost:4000/static/image/23550858740a56d55c988b301.jpg
+            type: 0
+    SuccessVideoUpload:
+      type: array
+      items:
+        type: object
+        properties:
+          url:
+            type: string
+          type:
+            $ref: '#/components/schemas/MediaType'
+      example:
+        items:
+          url: http://localhost:4000/static/video-streaming/LUzVIhTmGPKIdekJuadN4.mp4
+          type: 1
+    SuccessVideoHLSUpload:
+      type: array
+      items:
+        type: object
+        properties:
+          url:
+            type: string
+          type:
+            $ref: '#/components/schemas/MediaType'
+        example:
+          items:
+            url: http://localhost:4000/static/video-hls/rim2RZSFmRITdJm0sbLh5/master.m3u8
+            type: 2
+    VideoStatus:
+      type: object
+      properties:
+        _id:
+          type: string
+          format: mongoId
+          example: 65ed828a83f711deebd9a3d7
+        name:
+          type: string
+          example: rim2RZSFmRITdJm0sbLh5
+        status:
+          $ref: '#/components/schemas/VideoEncodingStatus'
+        message:
+          type: string
+          example: ''
+        created_at:
+          type: string
+          format: ISO8601
+          example: 2024-03-10T09:51:06.105Z
+        updated_at:
+          type: string
+          format: ISO8601
+          example: 2024-03-10T09:51:33.690Z
+    Hashtags:
+      type: object
+      properties:
+        _id:
+          type: string
+          format: mongoId
+          example: 65d9a9db031fed95c6c6cde3
+        name:
+          type: string
+          example: nodejs
+        created_at:
+          type: string
+          format: ISO8601
+          example: 2024-02-24T08:33:31.705Z
+    TweetBody:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/TweetType'
+        audience:
+          $ref: '#/components/schemas/TweetAudience'
+        content:
+          type: string
+          example: new tweet
+        parent_id:
+          type: string
+          format: mongoId
+          example: ''
+        hashtags:
+          type: array
+          items:
+            type: string
+            example: nodejs
+        mentions:
+          type: array
+          items:
+            type: string
+            format: mongoId
+            example: 65db0675b25c7ea693315a3df
+        medias:
+          type: array
+          items:
+            $ref: '#/components/schemas/Media'
+    Tweet:
+      type: object
+      properties:
+        _id:
+          type: string
+          format: mongoId
+          example: 65ed8e5883f711deebd9a3db
+        user_id:
+          type: string
+          format: mongoId
+          example: 65e1f35211686e9b7dddd742
+        type:
+          $ref: '#/components/schemas/TweetType'
+        audience:
+          $ref: '#/components/schemas/TweetAudience'
+        content:
+          type: string
+          example: new tweet
+        parent_id:
+          type: string
+          format: mongoId
+          example: 65db0675b25c7ea693315a61
+        hashtags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Hashtags'
+        mentions:
+          type: array
+          items:
+            type: string
+            format: mongoId
+            example: 65db0675b25c7ea693315a3df
+        medias:
+          type: array
+          items:
+            $ref: '#/components/schemas/Media'
+        guest_views:
+          type: number
+          example: 0
+        user_views:
+          type: number
+          example: 0
+        created_at:
+          type: string
+          format: ISO8601
+          example: 2024-03-10T10:41:28.213Z
+        updated_at:
+          type: string
+          format: ISO8601
+          example: 2024-03-10T10:41:28.213Z
+        bookmarks:
+          type: number
+          example: 0
+        likes:
+          type: number
+          example: 0
+        count_retweet:
+          type: number
+          example: 0
+        count_coment:
+          type: number
+          example: 0
+        count_quote:
+          type: number
+          example: 0
+    Tweets:
+      type: object
+      properties:
+        tweets:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tweet'
+        tweet_type:
+          $ref: '#/components/schemas/TweetType'
+        limit:
+          type: number
+          example: 5
+        page:
+          type: number
+          example: 1
+        total_page:
+          type: number
+          example: 1
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
