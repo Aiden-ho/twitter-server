@@ -2,16 +2,12 @@ openapi: 3.0.3
 info:
   title: Twitter Clone - OpenAPI 3.0
   description: |-
-    This is a sample Pet Store Server based on the OpenAPI 3.0 specification.  You can find out more about
-    Swagger at [https://swagger.io](https://swagger.io). In the third iteration of the pet store, we've switched to the design first approach!
-    You can now help us improve the API whether it's by making changes to the definition itself or to the code.
-    That way, with time, we can improve the API in general, and expose some of the new features in OAS3.
+    This is Twitter clone API project based on the OpenAPI 3.0 specification 
 
-    _If you're looking for the Swagger 2.0/OAS 2.0 version of Petstore, then click [here](https://editor.swagger.io/?url=https://petstore.swagger.io/v2/swagger.yaml). Alternatively, you can load via the `Edit > Load Petstore OAS 2.0` menu option!_
+    This project aims to replicate the core features of Twitter, allowing users to create accounts, post tweets, follow other users, like and retweet posts, and engage in discussions through comments. Users can personalize their profiles, explore trending topics, and discover new content. Our API provides endpoints for user authentication, CRUD operations for tweets and comments, user interactions. 
 
     Some useful links:
-    - [The Pet Store repository](https://github.com/swagger-api/swagger-petstore)
-    - [The source API definition for the Pet Store](https://github.com/swagger-api/swagger-petstore/blob/master/src/main/resources/openapi.yaml)
+    - [The project repository](https://github.com/swagger-api/swagger-petstore)
   contact:
     email: aiden.hokiet@gmail.com
   version: 1.0.0
@@ -26,6 +22,14 @@ tags:
     description: Operations about serving media
   - name: tweet
     description: Operations about tweet
+  - name: bookmark
+    description: Operations about bookmark
+  - name: like
+    description: Operations about like
+  - name: conversation
+    description: Operations about conversation
+  - name: search
+    description: Operations about search
 paths:
   /users/register:
     post:
@@ -853,6 +857,339 @@ paths:
           description: Invalid input
       security:
         - BearerAuth: []
+  /bookmarks/:
+    post:
+      tags:
+        - bookmark
+      summary: bookmark an existing tweet
+      description: bookmark an existing tweet
+      operationId: bookmarkTweet
+      requestBody:
+        description: Tweet id
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tweet_id:
+                  type: string
+                  format: mongoId
+                  example: 65db0675b25c7ea693315a61
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Bookmark successful
+                  result:
+                    $ref: '#/components/schemas/SuccessLikeandBookmark'
+        '400':
+          description: tweet id is invalid
+        '404':
+          description: tweet not found
+        '401':
+          description: Unauthorized
+        '403':
+          description: User not verified
+      security:
+        - BearerAuth: []
+  /bookmarks/tweet/{tweet_id}:
+    delete:
+      tags:
+        - bookmark
+      summary: bookmark an existing tweet
+      description: bookmark an existing tweet
+      operationId: unBookmarkTweet
+      parameters:
+        - name: tweet_id
+          in: path
+          description: id of tweet
+          required: true
+          schema:
+            type: string
+            example: 65db0675b25c7ea693315a61
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unbookmark successful
+        '400':
+          description: tweet id is invalid
+        '404':
+          description: tweet not found
+        '401':
+          description: Unauthorized
+        '403':
+          description: User not verified
+      security:
+        - BearerAuth: []
+  /likes/:
+    post:
+      tags:
+        - like
+      summary: like an existing tweet
+      description: like an existing tweet
+      operationId: likeTweet
+      requestBody:
+        description: Tweet id
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tweet_id:
+                  type: string
+                  format: mongoId
+                  example: 65db0675b25c7ea693315a61
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Like successful
+                  result:
+                    $ref: '#/components/schemas/SuccessLikeandBookmark'
+        '400':
+          description: tweet id is invalid
+        '404':
+          description: tweet not found
+        '401':
+          description: Unauthorized
+        '403':
+          description: User not verified
+      security:
+        - BearerAuth: []
+  /likes/tweet/{tweet_id}:
+    delete:
+      tags:
+        - like
+      summary: bookmark an existing tweet
+      description: bookmark an existing tweet
+      operationId: unBookmarkTweet
+      parameters:
+        - name: tweet_id
+          in: path
+          description: id of tweet
+          required: true
+          schema:
+            type: string
+            example: 65db0675b25c7ea693315a61
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unlike successful
+        '400':
+          description: tweet id is invalid
+        '404':
+          description: tweet not found
+        '401':
+          description: Unauthorized
+        '403':
+          description: User not verified
+      security:
+        - BearerAuth: []
+  /conversations/receiver/{receiver_id}?limit={limit}&page={page}:
+    get:
+      tags:
+        - conversation
+      summary: get conversation
+      description: get conversation between two users
+      operationId: getConversation
+      parameters:
+        - name: receiver_id
+          in: path
+          description: user id of reciever
+          required: true
+          schema:
+            type: string
+            format: mongoId
+            example: 65e1f35211686e9b7dddd742
+        - name: page
+          in: query
+          description: page of pagination
+          required: true
+          schema:
+            type: string
+            example: 1
+        - name: limit
+          in: query
+          description: limit of list pagination
+          required: true
+          schema:
+            type: string
+            example: 5
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Get new feeds successful
+                  result:
+                    $ref: '#/components/schemas/Conversations'
+        '401':
+          description: Unauthorized
+        '403':
+          description: User not verified
+        '422':
+          description: Invalid input
+      security:
+        - BearerAuth: []
+  /search?content={content}s&limit={limit}0&page={page}&people_followed={people_followed}&media_type={media_type}:
+    get:
+      tags:
+        - search
+      summary: search tweet by text
+      description: search tweet by content, media type, people followed
+      operationId: searchTweetByText
+      parameters:
+        - name: content
+          in: query
+          description: substring content of tweet
+          required: false
+          schema:
+            type: string
+            example: hot trend
+        - name: page
+          in: query
+          description: page of pagination
+          required: true
+          schema:
+            type: string
+            example: 1
+        - name: limit
+          in: query
+          description: limit of list pagination
+          required: true
+          schema:
+            type: string
+            example: 5
+        - name: people_followed
+          in: query
+          description: Onwer of tweet (PeopleFollowedQuery enum)
+          required: false
+          schema:
+            type: number
+            example: 0
+        - name: media_type
+          in: query
+          description: media type of tweet
+          required: false
+          schema:
+            $ref: '#/components/schemas/MediaTypeQuery'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Search successful
+                  result:
+                    $ref: '#/components/schemas/Tweets'
+        '401':
+          description: Unauthorized
+        '403':
+          description: User not verified
+        '422':
+          description: Invalid input
+      security:
+        - BearerAuth: []
+  /search/hashtag/{hashtag}&limit={limit}0&page={page}&people_followed={people_followed}&media_type={media_type}:
+    get:
+      tags:
+        - search
+      summary: search tweet by hashtag
+      description: search tweet by hashtags:, media type, people followed
+      operationId: searchTweetByHashtag
+      parameters:
+        - name: hashtag
+          in: path
+          description: hashtag of tweet
+          required: true
+          schema:
+            type: string
+            example: nodejs
+        - name: page
+          in: query
+          description: page of pagination
+          required: true
+          schema:
+            type: string
+            example: 1
+        - name: limit
+          in: query
+          description: limit of list pagination
+          required: true
+          schema:
+            type: string
+            example: 5
+        - name: people_followed
+          in: query
+          description: Onwer of tweet (PeopleFollowedQuery enum)
+          required: false
+          schema:
+            type: number
+            example: 0
+        - name: media_type
+          in: query
+          description: media type of tweet
+          required: false
+          schema:
+            $ref: '#/components/schemas/MediaTypeQuery'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Search successful
+                  result:
+                    $ref: '#/components/schemas/Tweets'
+        '401':
+          description: Unauthorized
+        '403':
+          description: User not verified
+        '422':
+          description: Invalid input
+      security:
+        - BearerAuth: []
 components:
   schemas:
     RegisterBody:
@@ -986,6 +1323,14 @@ components:
       type: number
       enum: [Everyone, TwitterCircle]
       example: 0
+    PeopleFollowedQuery:
+      type: number
+      enum: [Anyone, Followed]
+    MediaTypeQuery:
+      type: string
+      enum:
+        - image
+        - video
     Media:
       type: object
       properties:
@@ -1053,6 +1398,25 @@ components:
           items:
             url: http://localhost:4000/static/video-hls/rim2RZSFmRITdJm0sbLh5/master.m3u8
             type: 2
+    SuccessLikeandBookmark:
+      type: object
+      properties:
+        _id:
+          type: string
+          format: mongoId
+          example: 65eec5ffd350bea2056827e4
+        tweet_id:
+          type: string
+          format: mongoId
+          example: 65db0675b25c7ea693315a61
+        user_id:
+          type: string
+          format: mongoId
+          example: 65d8637b692b5b6128c3943d
+        created_at:
+          type: string
+          format: ISO8601
+          example: 2024-03-11T08:51:11.259Z
     VideoStatus:
       type: object
       properties:
@@ -1193,6 +1557,48 @@ components:
             $ref: '#/components/schemas/Tweet'
         tweet_type:
           $ref: '#/components/schemas/TweetType'
+        limit:
+          type: number
+          example: 5
+        page:
+          type: number
+          example: 1
+        total_page:
+          type: number
+          example: 1
+    Conversation:
+      type: object
+      properties:
+        _id:
+          type: string
+          format: mongoId
+          example: 65eb1e2ea11c21f36f7b6677
+        sender_id:
+          type: string
+          format: mongoId
+          example: 65e1f35211686e9b7dddd742
+        receiver_id:
+          type: string
+          format: mongoId
+          example: 65e60018aab8bd5204263176
+        content:
+          type: string
+          example: 'hello'
+        created_at:
+          type: string
+          format: ISO8601
+          example: 2024-03-08T14:18:22.933Z
+        updated_at:
+          type: string
+          format: ISO8601
+          example: 2024-03-08T14:18:22.933Z
+    Conversations:
+      type: object
+      properties:
+        conversations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Conversation'
         limit:
           type: number
           example: 5

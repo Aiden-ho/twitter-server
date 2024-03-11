@@ -1,5 +1,8 @@
 import express from 'express'
 import cors from 'cors'
+import swaggerUi, { SwaggerUiOptions } from 'swagger-ui-express'
+import { readFileSync } from 'fs'
+import { parse } from 'yaml'
 import { createServer } from 'http'
 import 'dotenv/config'
 import usersRouter from '~/routes/users.routes'
@@ -68,6 +71,15 @@ app.use('/likes', likesRouter)
 
 // handle routing conversation
 app.use('/conversations', conversationsRouter)
+
+const file = readFileSync('./twitter-swagger.yaml', 'utf8')
+const swaggerDocument = parse(file)
+
+// const option: SwaggerUiOptions = {
+//   customJs:
+// }
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
 //default error handler for app
 app.use(ErrorDefaultHandler)
