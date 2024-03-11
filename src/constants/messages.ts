@@ -97,8 +97,8 @@ export const TWEET_MESSAGES = {
   SEARCH_SUCCUSSFUL: 'Search successful',
   CONTENT_MUST_BE_A_STRING: 'Content must be string',
   HASHTAG_MUST_BE_A_STRING: 'Hashtag must be string',
-  MEDIA_TYPE_MUST_BE_IMAGE_OR_VIDEO: 'Media type mus be in [image, video]',
-  PEOPLE_FOLLOWED_MUST_BE_0_OR_1: 'People followed type mus be in [0, 1]'
+  MEDIA_TYPE_MUST_BE_IMAGE_OR_VIDEO: 'Media type must be in [image, video]',
+  PEOPLE_FOLLOWED_MUST_BE_0_OR_1: 'People followed type must be in [0, 1]'
 }
 
 export const BOOKMARK_MESSAGES = {
