@@ -57,6 +57,6 @@ export const searchHashTagValidator = validationRunner(
         }
       }
     },
-    ['query']
+    ['query', 'params']
   )
 )

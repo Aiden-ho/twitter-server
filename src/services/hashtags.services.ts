@@ -128,7 +128,7 @@ class HashtagServices {
                   audience: 1
                 },
                 {
-                  user_id: user_id
+                  user_id: new ObjectId(user_id)
                 }
               ]
             }
