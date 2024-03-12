@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import { ParamSchema, checkSchema } from 'express-validator'
 import { JsonWebTokenError } from 'jsonwebtoken'
 import { ObjectId } from 'mongodb'
+import { envConfig } from '~/constants/config'
 import { UserVerifyStatus } from '~/constants/enum'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { USER_MESSAGES } from '~/constants/messages'
@@ -75,7 +76,7 @@ const forgotPasswordSchema: ParamSchema = {
         //Verify token
         const decoded_forgot_password_token = await verifyToken({
           token: value,
-          secretKey: process.env.JWT_SERCRET_FORGOT_PASSWORD_TOKEN as string
+          secretKey: envConfig.jwtSecretForgotPasswordToken
         })
 
         const { user_id } = decoded_forgot_password_token
@@ -276,7 +277,7 @@ export const refreshTokenValidator = validationRunner(
               }
               //verufy refresh token
               const [decoded_refesh_token, refresh_token] = await Promise.all([
-                verifyToken({ token: value, secretKey: process.env.JWT_SERCRET_REFRESH_TOKEN as string }),
+                verifyToken({ token: value, secretKey: envConfig.jwtSecretRefreshToken }),
                 refreshTokensServices.get(value)
               ])
               //check refresh token is in DB
@@ -326,7 +327,7 @@ export const verifyEmailValidator = validationRunner(
 
               const decoded_email_verify_token = await verifyToken({
                 token: value,
-                secretKey: process.env.JWT_SERCRET_EMAIL_VERIFY_TOKEN as string
+                secretKey: envConfig.jwtSecretEmailVerifyToken
               })
 
               //add decode token to req

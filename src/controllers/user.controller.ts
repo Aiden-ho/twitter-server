@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 import { ObjectId } from 'mongodb'
+import { envConfig } from '~/constants/config'
 import { UserVerifyStatus } from '~/constants/enum'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { USER_MESSAGES } from '~/constants/messages'
@@ -78,7 +79,7 @@ export const loginOauthController = async (req: Request, res: Response) => {
     verify = UserVerifyStatus.Unverified
   }
 
-  const redirectUrl = `${process.env.CLIENT_REDIRECT_CALLBACK}?access_token=${result.access_token}&refresh_token=${result.refresh_token}&new_user=${new_user}&verify=${verify}`
+  const redirectUrl = `${envConfig.clientRedirectCallback}?access_token=${result.access_token}&refresh_token=${result.refresh_token}&new_user=${new_user}&verify=${verify}`
 
   res.redirect(redirectUrl)
 }

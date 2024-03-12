@@ -4,6 +4,7 @@ import { USER_MESSAGES } from '~/constants/messages'
 import { ErrorWithStatus } from '~/models/Errors'
 import { verifyToken } from './jwt'
 import { JsonWebTokenError } from 'jsonwebtoken'
+import { envConfig } from '~/constants/config'
 
 export const convertNumberEnumToArray = (target: { [key: string]: string | number }) => {
   return Object.values(target).filter((value) => typeof value === 'number') as number[]
@@ -26,7 +27,7 @@ export const verifyAccessToken = async (access_token: string, req?: Request) => 
     access_token = access_token.replace('Bearer ', '')
     const decoded_authorization = await verifyToken({
       token: access_token,
-      secretKey: process.env.JWT_SERCRET_ACCESS_TOKEN as string
+      secretKey: envConfig.jwtSecretAccessToken
     })
     if (req) {
       //add decode token to req

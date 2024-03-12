@@ -12,6 +12,7 @@ import { NextFunction, Request, Response } from 'express'
 import Tweet from '~/models/schemas/Tweet.schema'
 import { wrapperRequestHandler } from '~/utils/handlers'
 import databaseServices from '~/services/database.services'
+import { envConfig } from '~/constants/config'
 
 const arrayTweetType = convertNumberEnumToArray(TweetType)
 const arrayTweetAudience = convertNumberEnumToArray(TweetAudience)
@@ -228,7 +229,7 @@ export const paginationValidator = validationRunner(
           options: (value, { req }) => {
             const num = Number(value)
 
-            if (num > Number(process.env.MAXIMUM_LIMIT_TWEET) || num < Number(process.env.MINIMUM_LIMIT_TWEET)) {
+            if (num > Number(envConfig.maximumLimitTweet) || num < Number(envConfig.miniumLimitTweet)) {
               throw new Error(TWEET_MESSAGES.LIMIT_VALUE_MUST_BE_FROM_1_TO_100)
             }
 

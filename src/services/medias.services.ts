@@ -6,7 +6,7 @@ import { UPLOAD_IMAGE_DIR, UPLOAD_VIDEO_DIR } from '~/constants/dir'
 import { getFilesInDir, getNameFormFileName, uploadImages, uploadVideos } from '~/utils/file'
 import fs from 'fs'
 import fsPromise from 'fs/promises'
-import { isProduction } from '~/constants/config'
+import { envConfig, isProduction } from '~/constants/config'
 import { MediaType, VideoEncodingStatus } from '~/constants/enum'
 import { Media } from '~/models/Others'
 import { encodeHLSWithMultipleVideoStreams } from '~/utils/video'
@@ -126,8 +126,8 @@ class MediasServices {
         //use BE system to serve file
         return {
           url: isProduction
-            ? `${process.env.HOST}/static/image/${newFullName}`
-            : `http://localhost:${process.env.PORT}/static/image/${newFullName}`,
+            ? `${envConfig.host}/static/image/${newFullName}`
+            : `http://localhost:${envConfig.port}/static/image/${newFullName}`,
           type: MediaType.Image
         }
       })
@@ -156,8 +156,8 @@ class MediasServices {
 
         return {
           url: isProduction
-            ? `${process.env.HOST}/static/video-streaming/${newFilename}`
-            : `http://localhost:${process.env.PORT}/static/video-streaming/${newFilename}`,
+            ? `${envConfig.host}/static/video-streaming/${newFilename}`
+            : `http://localhost:${envConfig.port}/static/video-streaming/${newFilename}`,
           type: MediaType.Video
         }
       })
@@ -177,8 +177,8 @@ class MediasServices {
         queue.enqueue(filepath)
         return {
           url: isProduction
-            ? `${process.env.HOST}/static/video/${newName}/master.m3u8`
-            : `http://localhost:${process.env.PORT}/static/video-hls/${newName}/master.m3u8`,
+            ? `${envConfig.host}/static/video/${newName}/master.m3u8`
+            : `http://localhost:${envConfig.port}/static/video-hls/${newName}/master.m3u8`,
           type: MediaType.HLS
         }
       })

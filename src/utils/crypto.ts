@@ -1,9 +1,8 @@
 import { createHmac, randomBytes } from 'node:crypto'
+import { envConfig } from '~/constants/config'
 
 export function sha256(content: string) {
-  return createHmac('sha256', process.env.PASSWORD_SECRET as string)
-    .update(content)
-    .digest('hex')
+  return createHmac('sha256', envConfig.passwordSecret).update(content).digest('hex')
 }
 
 export function hashPassword(password: string) {

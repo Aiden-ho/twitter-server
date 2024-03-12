@@ -9,12 +9,13 @@ import { UserVerifyStatus } from '~/constants/enum'
 import { ErrorWithStatus } from '~/models/Errors'
 import { USER_MESSAGES } from '~/constants/messages'
 import HTTP_STATUS from '~/constants/httpStatus'
+import { envConfig } from '~/constants/config'
 
 function initSocket(httpServer: HttpServer) {
   // Tạo IO server
   const io = new Server(httpServer, {
     cors: {
-      origin: process.env.CLIENT_URL
+      origin: envConfig.clientUrl
     }
   })
 

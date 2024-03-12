@@ -3,10 +3,11 @@ import databaseServices from './database.services'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import { verifyToken } from '~/utils/jwt'
 import { PayloadToken } from '~/models/requests/User.request'
+import { envConfig } from '~/constants/config'
 
 class RefreshTokensServices {
   private decodeRefreshToken(token: string) {
-    return verifyToken({ token, secretKey: process.env.JWT_SERCRET_REFRESH_TOKEN as string })
+    return verifyToken({ token, secretKey: envConfig.jwtSecretRefreshToken })
   }
 
   async save(user_id: string, token: string) {

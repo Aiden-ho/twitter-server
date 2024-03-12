@@ -1,13 +1,14 @@
 import { SendEmailCommand, SESClient } from '@aws-sdk/client-ses'
 import path from 'path'
 import fs from 'fs'
+import { envConfig } from '~/constants/config'
 
 //Create SES service object.
 const sesClient = new SESClient({
-  region: process.env.AWS_REGION,
+  region: envConfig.awsRegion,
   credentials: {
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID as string
+    secretAccessKey: envConfig.awsSecretAccessKey,
+    accessKeyId: envConfig.awsAccessKeyId
   }
 })
 
@@ -53,7 +54,7 @@ const createSendEmailCommand = ({
 
 export const sendVerifyEmail = async (toAddress: string, subject: string, body: string) => {
   const sendEmailCommand = createSendEmailCommand({
-    fromAddress: process.env.SES_FROM_ADDRESS as string,
+    fromAddress: envConfig.sesFromAddress,
     toAddresses: toAddress,
     body,
     subject
@@ -78,7 +79,7 @@ export const sendVerifyEmailRegister = ({
   email_verify_token: string
   template?: string
 }) => {
-  const url = `${process.env.CLIENT_URL}/verify-email?token=${email_verify_token}`
+  const url = `${envConfig.clientUrl}/verify-email?token=${email_verify_token}`
   return sendVerifyEmail(
     email,
     'Verify your email',
@@ -100,7 +101,7 @@ export const sendEmailForgotPassword = ({
   forgot_password_token: string
   template?: string
 }) => {
-  const url = `${process.env.CLIENT_URL}/forgot-password?token=${forgot_password_token}`
+  const url = `${envConfig.clientUrl}/forgot-password?token=${forgot_password_token}`
   return sendVerifyEmail(
     email,
     'Please reset your password',

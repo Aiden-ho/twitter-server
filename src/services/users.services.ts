@@ -10,37 +10,38 @@ import refreshTokensServices from './refreshTokens.services'
 import { ObjectId } from 'mongodb'
 import { USER_MESSAGES } from '~/constants/messages'
 import { sendEmailForgotPassword, sendVerifyEmailRegister } from '~/utils/send-email'
+import { envConfig } from '~/constants/config'
 
 class UserServices {
   private signAccessToken({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
     return signToken({
       payload: { user_id, token_type: TokenType.AccessToken, verify },
-      privateKey: process.env.JWT_SERCRET_ACCESS_TOKEN as string,
-      options: { expiresIn: process.env.ACCESS_TOKEN_EXPIRED }
+      privateKey: envConfig.jwtSecretAccessToken,
+      options: { expiresIn: envConfig.accessTokenExpired }
     })
   }
 
   private signRefreshToken({ user_id, verify, exp }: { user_id: string; verify: UserVerifyStatus; exp?: number }) {
     return signToken({
       payload: { user_id, token_type: TokenType.AccessToken, verify, ...(exp && { exp }) },
-      privateKey: process.env.JWT_SERCRET_REFRESH_TOKEN as string,
-      ...(!exp && { options: { expiresIn: process.env.REFRESH_TOKEN_EXPIRED } })
+      privateKey: envConfig.jwtSecretRefreshToken,
+      ...(!exp && { options: { expiresIn: envConfig.refreshTokenExpired } })
     })
   }
 
   private signEmailVerifyToken({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
     return signToken({
       payload: { user_id, token_type: TokenType.AccessToken, verify },
-      privateKey: process.env.JWT_SERCRET_EMAIL_VERIFY_TOKEN as string,
-      options: { expiresIn: process.env.EMAIL_VERIFY_TOKEN_EXPIRED }
+      privateKey: envConfig.jwtSecretEmailVerifyToken,
+      options: { expiresIn: envConfig.emailVerifyTokenExpired }
     })
   }
 
   private signforgotPasswordToken({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
     return signToken({
       payload: { user_id, token_type: TokenType.AccessToken, verify },
-      privateKey: process.env.JWT_SERCRET_FORGOT_PASSWORD_TOKEN as string,
-      options: { expiresIn: process.env.FORGOT_PASSWORD_TOKEN_EXPIRED }
+      privateKey: envConfig.jwtSecretForgotPasswordToken,
+      options: { expiresIn: envConfig.forgotPasswordTokenExpired }
     })
   }
 
@@ -59,9 +60,9 @@ class UserServices {
   private async getOauthGoogleToken(code: string) {
     const body = {
       code,
-      client_id: process.env.GOOGLE_CLIENT_ID,
-      client_secret: process.env.GOOGLE_CLIENT_SECRET,
-      redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+      client_id: envConfig.googleClientId,
+      client_secret: envConfig.googleClientSecret,
+      redirect_uri: envConfig.googleRedirectUri,
       access_type: 'offline',
       grant_type: 'authorization_code'
     }
