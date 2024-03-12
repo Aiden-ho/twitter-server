@@ -1,10 +1,11 @@
 import express from 'express'
 import cors from 'cors'
-import swaggerUi, { SwaggerUiOptions } from 'swagger-ui-express'
+import helmet from 'helmet'
+import { rateLimit } from 'express-rate-limit'
+import swaggerUi from 'swagger-ui-express'
 import { readFileSync } from 'fs'
 import { parse } from 'yaml'
 import { createServer } from 'http'
-import 'dotenv/config'
 import usersRouter from '~/routes/users.routes'
 import databaseServices from './services/database.services'
 import { ErrorDefaultHandler } from './middlewares/errors.middlewares'
@@ -17,6 +18,7 @@ import likesRouter from './routes/likes.routes'
 import searchRouter from './routes/search.routes'
 import conversationsRouter from './routes/conversations.routes'
 import initSocket from './utils/socket'
+import { envConfig, isProduction } from './constants/config'
 
 //import fake data
 // import './utils/fake'
@@ -25,8 +27,7 @@ const app = express()
 const httpServer = createServer(app)
 
 initSocket(httpServer)
-
-const port = process.env.PORT || '4000'
+const port = envConfig.port
 
 //build-in parse json based on body-parse
 app.use(express.json())
@@ -42,8 +43,26 @@ databaseServices.connect().then(() => {
   databaseServices.indexHashTags()
 })
 
+//Helmet
+app.use(helmet())
+
 //CORS
-app.use(cors())
+app.use(
+  cors({
+    origin: isProduction ? envConfig.host : '*'
+  })
+)
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
+  standardHeaders: 'draft-7', // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
+  legacyHeaders: false // Disable the `X-RateLimit-*` headers.
+  // store: ... , // Redis, Memcached, etc. See below.
+})
+
+// Apply the rate limiting middleware to all requests.
+app.use(limiter)
 
 //create folder
 initFolder()
