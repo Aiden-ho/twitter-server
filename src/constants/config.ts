@@ -26,7 +26,7 @@ config({
 export const isProduction = Boolean(env === 'production')
 
 export const envConfig = {
-  port: (process.env.PORT as string) || 4000,
+  port: (process.env.PORT as string) || 3000,
   host: process.env.HOST as string,
   clientUrl: process.env.CLIENT_URL as string,
   dbUsername: process.env.DB_USERNAME as string,
