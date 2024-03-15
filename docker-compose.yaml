@@ -1,0 +1,8 @@
+version: '1'
+services:
+  twitter:
+    image: aidenho277/twitter-clone:v0
+    ports:
+      - 4000:4000
+    volumes:
+      - ~/Desktop/BackEnd/progress/twitter-server/uploads/:/app/uploads
