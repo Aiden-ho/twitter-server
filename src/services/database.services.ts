@@ -80,6 +80,13 @@ class DatabaseServices {
     }
   }
 
+  async indexConversation() {
+    const exist = await this.conversations.indexExists(['sender_id_1_receiver_id_1'])
+    if (!exist) {
+      this.conversations.createIndex({ sender_id: 1, receiver_id: 1 })
+    }
+  }
+
   get users(): Collection<User> {
     return this.db.collection(envConfig.dbUserCollection)
   }

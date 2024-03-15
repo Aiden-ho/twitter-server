@@ -41,6 +41,7 @@ databaseServices.connect().then(() => {
   databaseServices.indexFollowers()
   databaseServices.indexTweets()
   databaseServices.indexHashTags()
+  databaseServices.indexConversation()
 })
 
 //Helmet
