@@ -7,7 +7,7 @@ info:
     This project aims to replicate the core features of Twitter, allowing users to create accounts, post tweets, follow other users, like and retweet posts, and engage in discussions through comments. Users can personalize their profiles, explore trending topics, and discover new content. Our API provides endpoints for user authentication, CRUD operations for tweets and comments, user interactions. 
 
     Some useful links:
-    - [The project repository](https://github.com/swagger-api/swagger-petstore)
+    - [The project repository](https://github.com/Aiden-ho/twitter-server)
   contact:
     email: aiden.hokiet@gmail.com
   version: 1.0.0
