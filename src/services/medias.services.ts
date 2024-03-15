@@ -27,7 +27,9 @@ class Queue {
   async enqueue(item: string) {
     this.items.push(item)
     //item = home\123\12312\123123.mp4
-    const videoName = getNameFormFileName(item.split(/\\/g).pop() as string) as string
+    const slash = (await import('slash')).default
+    item = slash(item)
+    const videoName = getNameFormFileName(item.split('/').pop() as string) as string
     await videosStatusServices.save({ name: videoName, status: VideoEncodingStatus.Pending })
     this.processEncode()
   }
@@ -144,11 +146,13 @@ class MediasServices {
         const { newFilename, filepath, mimetype } = file
 
         //upload video to S3
+        /*
         await uploadFileToS3({
           fileName: 'videos/' + newFilename,
           filePath: filepath,
           contentType: mimetype as string
         })
+        */
 
         //xóa file gốc.
         // Nếu dùng S3 cho video thì nhớ mở cái này ra, nếu dùng source thì comment

@@ -2,6 +2,7 @@ import { S3 } from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
 import { Response } from 'express'
 import fs from 'fs'
+import path from 'path'
 import { envConfig } from '~/constants/config'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { USER_MESSAGES } from '~/constants/messages'
@@ -28,7 +29,7 @@ export const uploadFileToS3 = ({
     params: {
       Bucket: envConfig.awsS3Bucket,
       Key: fileName,
-      Body: fs.readFileSync(filePath),
+      Body: fs.readFileSync(path.resolve(filePath)),
       ContentType: contentType
     },
 
