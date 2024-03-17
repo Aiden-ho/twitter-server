@@ -9,34 +9,35 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    outputs:
+      image_tag: ${{ steps.build_image.outputs.image_tag }}
     steps:
       - uses: actions/checkout@v3
       - name: 'create env file'
         run: echo "${{ secrets.TWITTER_ENV_PRODUCTION }}" > .env.production
       - name: Build the Docker image
         run: |
-          IMAGE_TAG=aidenho277/twitter-clone:$(date +%s)
-          docker build . --file Dockerfile --tag $IMAGE_TAG
-          echo "::set-output name=image_tag::$IMAGE_TAG"
-        id: build
+          IMAGE_TAG=$(date +%s)
+          docker build . --file Dockerfile --tag aidenho277/twitter-clone:$IMAGE_TAG
+          echo "image_tag=$IMAGE_TAG" >> "$GITHUB_OUTPUT"
+        id: build_image
       - name: Log in to Docker Hub
         run: docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_PASSWORD }}
       - name: Push Docker image to Docker Hub
-        run: docker push ${{ steps.build.outputs.image_tag }}
+        run: docker push aidenho277/twitter-clone:${{ steps.build_image.outputs.image_tag }}
   deploy:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Executing remote ssh commands using password
+      - name: executing remote ssh commands using ssh key
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_PASSWORD }}
-          password: ${{ secrets.VPS_USERNAME }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_KEY }}
           script: |
             docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_PASSWORD }}
-            docker pull ${{ steps.build.outputs.image_tag }}
+            docker pull aidenho277/twitter-clone:${{ needs.build.outputs.image_tag }}
             docker stop twitter-clone
             docker rm twitter-clone
-            docker run -dp 3000:3000 --name twitter-clone --restart unless-stopped -v ~/twitter-server/uploads:/app/uploads ${{ steps.build.outputs.image_tag }}
+            docker run -dp 3000:3000 --name twitter-clone --restart unless-stopped -v ~/twitter-server/uploads:/app/uploads aidenho277/twitter-clone:${{ needs.build.outputs.image_tag }}
